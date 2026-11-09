@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = "gemini-3.8-flash";
+const const MODEL = "gemini-3.5-flash-lite";
 
 const headers = {
   "Content-Type": "application/json",
