@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="TABISWITCH">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="旅先で、困らない。海外旅行中の困りごとをひとつのAIで解決するTABISWITCH AI。">
+<title>TABISWITCH AI｜旅先で、困らない。</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310223F'/%3E%3Crect x='12' y='22' width='40' height='20' rx='10' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Ccircle cx='42' cy='32' r='6' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#FFFFFF;
+  --surface:#F4F6F9;
+  --surface-2:#EDF0F5;
+  --ink:#0E1A2B;
+  --ink-2:#38465A;
+  --muted:#6F7B8C;
+  --line:#E2E6EC;
+  --navy:#10223F;
+  --blue:#2B5BA8;
+  --blue-soft:#EAF0F9;
+  --danger:#B93A2E;
+  --danger-soft:#FBEEEC;
+  --ok:#2E7D5B;
+  --r-card:22px;
+  --r-ctl:14px;
+  --r-pill:999px;
+  --shadow:0 1px 2px rgba(16,34,63,.05),0 6px 20px rgba(16,34,63,.06);
+  --nav-h:62px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+  --font:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);overflow-x:hidden}
+body{font-size:16px;line-height:1.65;letter-spacing:.01em;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+a{color:var(--blue)}
+img{max-width:100%;display:block}
+.ic{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2.5px solid var(--blue);outline-offset:2px;border-radius:10px}
+
+/* ---------- app frame ---------- */
+.app{max-width:560px;margin:0 auto;min-height:100vh;min-height:100dvh;padding-bottom:calc(var(--nav-h) + var(--safe-b) + 24px)}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.88);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);padding:calc(var(--safe-t) + 10px) 18px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid transparent;transition:border-color .2s}
+.topbar.scrolled{border-bottom-color:var(--line)}
+.brand{display:flex;align-items:center;gap:9px;min-width:0;flex:1}
+.brand-mark{width:30px;height:18px;flex:none}
+.brand-name{font-weight:700;font-size:16px;letter-spacing:.06em;white-space:nowrap}
+.brand-name span{font-weight:500;color:var(--muted);margin-left:4px;letter-spacing:.02em}
+.back{display:none;align-items:center;gap:2px;height:40px;padding:0 6px 0 0;color:var(--ink);font-weight:600;font-size:17px;min-width:0}
+.back .ic{width:24px;height:24px}
+.back-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar.sub .brand{display:none}
+.topbar.sub .back{display:flex;flex:1}
+.region-pill{display:flex;align-items:center;gap:7px;height:36px;padding:0 12px 0 6px;border-radius:var(--r-pill);background:var(--surface);font-size:14px;font-weight:600;white-space:nowrap}
+.region-code{display:inline-grid;place-items:center;height:24px;min-width:30px;padding:0 6px;border-radius:var(--r-pill);background:var(--navy);color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em}
+.icon-btn{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;color:var(--ink-2)}
+.icon-btn:active{background:var(--surface)}
+
+.view{display:none;padding:8px 18px 0}
+.view.active{display:block;animation:viewIn .28s ease}
+@keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- type ---------- */
+h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:.01em}
+.hero{padding:22px 2px 18px}
+.hero h1{font-size:28px;line-height:1.35;letter-spacing:.005em;font-feature-settings:"palt"}
+.hero p{margin:8px 0 0;color:var(--muted);font-size:15px}
+.sec-title{font-size:18px;margin:30px 2px 12px}
+.view-intro{color:var(--ink-2);font-size:15px;margin:6px 2px 18px}
+.note{font-size:13px;line-height:1.6;color:var(--muted)}
+
+/* ---------- composer ---------- */
+.composer{display:flex;align-items:flex-end;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-card);padding:8px 8px 8px 16px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
+.composer:focus-within{border-color:#B9C8E2;box-shadow:0 0 0 4px rgba(43,91,168,.09),var(--shadow)}
+.composer textarea{flex:1;border:0;outline:0;resize:none;background:transparent;font-size:16px;line-height:1.5;padding:9px 0;max-height:140px;min-height:42px}
+.composer textarea::placeholder{color:#9AA4B2}
+.send-btn{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;flex:none;transition:transform .15s,opacity .15s}
+.send-btn:active{transform:scale(.94)}
+.send-btn:disabled{opacity:.35}
+.send-btn .ic{width:20px;height:20px;stroke-width:2.2}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{text-decoration:none;display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:7px 14px;border-radius:var(--r-pill);background:var(--surface);color:var(--ink-2);font-size:14px;line-height:1.35;text-align:left}
+.chip:active{background:var(--surface-2)}
+.chip.on{background:var(--navy);color:#fff}
+.chip .ic{width:17px;height:17px}
+
+/* ---------- feature grid ---------- */
+.features{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.feature{color:inherit;text-decoration:none;display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-height:128px;padding:16px;border-radius:var(--r-card);background:var(--surface);text-align:left;transition:transform .15s,background .15s}
+.feature:active{transform:scale(.98);background:var(--surface-2)}
+.feature .f-ic{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--bg);color:var(--navy)}
+.feature strong{font-size:16px;line-height:1.3}
+.feature small{font-size:12.5px;line-height:1.5;color:var(--muted)}
+.feature.danger{background:var(--danger-soft)}
+.feature.danger .f-ic{color:var(--danger)}
+
+/* ---------- cards & forms ---------- */
+.card{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-card);padding:18px}
+.card + .card{margin-top:12px}
+.card-flat{background:var(--surface);border-radius:var(--r-card);padding:18px}
+.card h3{font-size:16px;margin-bottom:8px}
+.row{display:flex;align-items:center;gap:10px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.input,.select,.textarea{width:100%;min-height:48px;border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--bg);padding:11px 14px;font-size:16px;outline:0;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+.textarea{min-height:110px;resize:vertical;line-height:1.55}
+.select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236F7B8C' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:20px;padding-right:40px}
+.input:focus,.select:focus,.textarea:focus{border-color:#9DB3D9;box-shadow:0 0 0 4px rgba(43,91,168,.09)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:12px 18px;border-radius:var(--r-ctl);font-weight:600;font-size:16px;transition:transform .15s,opacity .15s,background .15s;text-decoration:none;text-align:center;line-height:1.35}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.4;pointer-events:none}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-soft{background:var(--surface);color:var(--ink)}
+.btn-line{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-block{width:100%}
+.btn .ic{width:20px;height:20px}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mini-btn{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:6px 12px;border-radius:var(--r-pill);background:var(--surface);font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.mini-btn .ic{width:17px;height:17px}
+.mini-btn:active{background:var(--surface-2)}
+
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface);border-radius:var(--r-ctl);padding:4px;gap:4px}
+.seg button{min-height:42px;border-radius:11px;font-size:14.5px;font-weight:600;color:var(--ink-2)}
+.seg button.on{background:var(--bg);color:var(--ink);box-shadow:0 1px 3px rgba(16,34,63,.12)}
+
+.link-list{display:flex;flex-direction:column}
+.link-item{display:flex;align-items:center;gap:12px;min-height:56px;padding:10px 2px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.link-item:last-child{border-bottom:0}
+.link-item .li-main{flex:1;min-width:0}
+.link-item .li-main b{display:block;font-size:15.5px;font-weight:600}
+.link-item .li-main span{display:block;font-size:13px;color:var(--muted);line-height:1.5}
+.link-item .ic{color:var(--muted);width:19px;height:19px}
+
+.status{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:var(--ink-2);padding:10px 12px;background:var(--surface);border-radius:12px;margin-top:10px}
+.status.ok{color:var(--ok);background:#EAF5EF}
+.status.err{color:var(--danger);background:var(--danger-soft)}
+.status .ic{width:18px;height:18px;margin-top:2px}
+
+/* ---------- hotel quick ---------- */
+.hotel-quick{display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--r-card);background:var(--navy);color:#fff;margin-top:12px}
+.hotel-quick .hq-ic{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.12);flex:none}
+.hotel-quick .hq-main{flex:1;min-width:0}
+.hotel-quick b{display:block;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hotel-quick span{display:block;font-size:12.5px;opacity:.75}
+.hotel-quick .hq-btns{display:flex;gap:6px}
+.hotel-quick .hq-btns button,.hotel-quick .hq-btns a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff}
+.hotel-empty{text-decoration:none;display:flex;align-items:center;gap:12px;width:100%;padding:16px;border-radius:var(--r-card);border:1px dashed #C9D2DE;color:var(--ink-2);margin-top:12px;text-align:left}
+.hotel-empty .ic{color:var(--blue)}
+
+/* ---------- chat ---------- */
+#view-chat{padding-bottom:0}
+.chat-log{display:flex;flex-direction:column;gap:16px;padding:6px 0 18px;min-height:40vh}
+.msg-user{align-self:flex-end;max-width:84%;background:var(--navy);color:#fff;padding:11px 15px;border-radius:20px 20px 6px 20px;white-space:pre-wrap;word-break:break-word;font-size:15.5px;line-height:1.6}
+.msg-user img{border-radius:12px;margin-bottom:8px;max-height:180px}
+.msg-ai{align-self:stretch;background:var(--bg);border:1px solid var(--line);border-radius:6px 22px 22px 22px;padding:14px 16px}
+.msg-ai .ai-head{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;letter-spacing:.04em}
+.msg-ai .ai-head .brand-mark{width:24px;height:14px}
+.md{font-size:15.5px;line-height:1.75;word-break:break-word;overflow-wrap:anywhere}
+.md p{margin:0 0 10px}
+.md h4{font-size:15.5px;margin:14px 0 6px;color:var(--navy)}
+.md h4:first-child{margin-top:2px}
+.md ul,.md ol{margin:0 0 10px;padding-left:1.4em}
+.md li{margin:3px 0}
+.md strong{font-weight:700}
+.md code{background:var(--surface);padding:1px 6px;border-radius:6px;font-size:.92em}
+.md a{word-break:break-all}
+.msg-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.msg-err{align-self:stretch;background:var(--danger-soft);color:var(--danger);border-radius:16px;padding:12px 14px;font-size:14.5px}
+.typing{align-self:flex-start;display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;padding:6px 4px}
+.dots{display:inline-flex;gap:4px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--blue);opacity:.3;animation:dot 1.2s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.chat-dock{position:sticky;bottom:calc(var(--nav-h) + var(--safe-b));z-index:20;background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 18px);padding:18px 0 10px}
+.chat-tools{display:flex;gap:8px;margin-bottom:8px;overflow-x:auto;scrollbar-width:none}
+.chat-tools::-webkit-scrollbar{display:none}
+.chat-tools .chip{white-space:nowrap;flex:none}
+.chat-empty h2{font-size:22px;margin:14px 2px 4px}
+.mode-tag{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--blue);background:var(--blue-soft);border-radius:var(--r-pill);padding:4px 10px;margin:4px 2px 8px}
+
+/* ---------- translate ---------- */
+.lang-bar{display:grid;grid-template-columns:1fr 44px 1fr;align-items:center;gap:6px;margin-bottom:12px}
+.lang-bar .select{min-height:46px;font-weight:600;text-align:center;text-align-last:center;padding-left:12px}
+.swap{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--surface);color:var(--ink-2)}
+.result-big{margin-top:14px;padding:20px 18px;border-radius:var(--r-card);background:var(--blue-soft)}
+.result-big .rb-label{font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:8px;letter-spacing:.04em}
+.result-big .rb-text{font-size:27px;line-height:1.45;font-weight:600;word-break:break-word;color:var(--ink)}
+.result-big .rb-read{margin-top:8px;font-size:15px;color:var(--ink-2)}
+.result-big .rb-note{margin-top:8px;font-size:13.5px;color:var(--muted)}
+.result-big .msg-actions{margin-top:14px}
+.result-big .mini-btn{background:rgba(255,255,255,.75)}
+.phrase{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 4px;border-bottom:1px solid var(--line);text-align:left}
+.phrase:last-child{border-bottom:0}
+.phrase .p-main{flex:1;min-width:0}
+.phrase .p-ja{font-size:13.5px;color:var(--muted);display:block}
+.phrase .p-local{font-size:18px;font-weight:600;display:block;line-height:1.45;word-break:break-word}
+.phrase .ic{color:var(--muted)}
+
+/* ---------- photo ---------- */
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:200px;padding:20px;border-radius:var(--r-card);background:var(--surface);text-align:center;color:var(--muted)}
+.drop .ic{width:40px;height:40px;stroke-width:1.4;color:var(--navy)}
+.preview-wrap{position:relative;border-radius:var(--r-card);overflow:hidden;background:#000}
+.preview-wrap img{width:100%;max-height:420px;object-fit:contain;margin:0 auto}
+.preview-del{position:absolute;top:10px;right:10px;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:rgba(14,26,43,.66);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.preview-meta{font-size:12.5px;color:var(--muted);margin-top:8px}
+.warn{display:flex;gap:10px;padding:12px 14px;border-radius:14px;background:#FFF6E5;color:#7A5200;font-size:13.5px;line-height:1.6;margin:14px 0}
+.warn .ic{width:20px;height:20px;flex:none;margin-top:1px}
+.result-card{margin-top:16px;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
+.result-card .rc-head{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface)}
+.result-card .rc-head img{width:48px;height:48px;object-fit:cover;border-radius:10px}
+.result-card .rc-head b{font-size:15px}
+.result-card .rc-head span{display:block;font-size:12.5px;color:var(--muted)}
+.result-card .rc-body{padding:16px}
+
+/* ---------- emergency ---------- */
+.sos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sos{display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:86px;padding:14px;border-radius:18px;background:var(--danger-soft);color:var(--danger);text-decoration:none}
+.sos b{font-size:28px;line-height:1.1;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.sos span{font-size:12.5px;line-height:1.4;color:#7C2A22}
+.sos.calm{background:var(--surface);color:var(--navy)}
+.sos.calm span{color:var(--ink-2)}
+details.trouble{border-bottom:1px solid var(--line)}
+details.trouble:last-of-type{border-bottom:0}
+details.trouble summary{list-style:none;display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 2px;font-weight:600;font-size:16px;cursor:pointer}
+details.trouble summary::-webkit-details-marker{display:none}
+details.trouble summary .chev{margin-left:auto;transition:transform .2s;color:var(--muted)}
+details.trouble[open] summary .chev{transform:rotate(90deg)}
+.steps{margin:0 0 14px;padding:0;list-style:none;counter-reset:s}
+.steps li{position:relative;padding:4px 0 10px 40px;font-size:15px;line-height:1.65;counter-increment:s}
+.steps li::before{content:counter(s);position:absolute;left:2px;top:3px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:13px;font-weight:700}
+
+/* ---------- region sheet / overlay ---------- */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(14,26,43,.38);opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-width:560px;margin:0 auto;background:var(--bg);border-radius:26px 26px 0 0;padding:10px 18px calc(22px + var(--safe-b));transform:translateY(105%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s linear .32s;max-height:88vh;overflow:auto;overscroll-behavior:contain}
+.sheet.show{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px}
+.sheet h2{font-size:19px;margin-bottom:4px}
+.region-opt{display:flex;align-items:center;gap:14px;width:100%;min-height:68px;padding:12px 14px;border-radius:18px;background:var(--surface);margin-top:10px;text-align:left}
+.region-opt.on{background:var(--navy);color:#fff}
+.region-opt.on .region-code{background:#fff;color:var(--navy)}
+.region-opt b{display:block;font-size:16.5px}
+.region-opt span{display:block;font-size:13px;opacity:.7}
+
+.show-screen{position:fixed;inset:0;z-index:80;background:var(--navy);color:#fff;display:none;flex-direction:column;padding:calc(var(--safe-t) + 14px) 22px calc(var(--safe-b) + 22px);overflow:auto}
+.show-screen.show{display:flex;animation:viewIn .25s ease}
+.show-screen .ss-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.show-screen .ss-top span{font-size:13px;opacity:.7}
+.show-screen .ss-close{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff}
+.show-screen .ss-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;padding:24px 0}
+.ss-lead{font-size:clamp(28px,8.5vw,46px);line-height:1.35;font-weight:700;word-break:break-word}
+.ss-main{font-size:clamp(22px,6.5vw,34px);line-height:1.45;font-weight:600;word-break:break-word}
+.ss-sub{font-size:17px;line-height:1.6;opacity:.85;word-break:break-word}
+.ss-ja{font-size:14px;opacity:.6}
+.show-screen .ss-actions{display:flex;gap:10px;flex-wrap:wrap}
+.show-screen .ss-actions a,.show-screen .ss-actions button{flex:1;min-width:140px;justify-content:center;background:rgba(255,255,255,.14);color:#fff}
+
+/* ---------- bottom nav ---------- */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(255,255,255,.92);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line);padding-bottom:var(--safe-b)}
+.tabbar-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);height:var(--nav-h)}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#8792A2;font-size:10.5px;font-weight:600;text-decoration:none}
+.tab .ic{width:24px;height:24px}
+.tab.on{color:var(--navy)}
+.tab.on .ic{stroke-width:2.1}
+
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + var(--safe-b) + 16px);z-index:90;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:#fff;font-size:14px;padding:11px 18px;border-radius:var(--r-pill);transition:all .25s;width:max-content;max-width:calc(100% - 40px);text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.footer-note{margin:28px 2px 0;font-size:12.5px;line-height:1.7;color:var(--muted)}
+.spacer{height:12px}
+.hidden{display:none !important}
+.spin{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite}
+.btn-soft .spin,.btn-line .spin{border-color:rgba(16,34,63,.2);border-top-color:var(--navy)}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+@media (min-width:420px){.hero h1{font-size:30px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<!-- アイコンスプライト（すべて同じ線幅・角丸で統一） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H9.2l-4.4 3.4c-.33.25-.8.02-.8-.4z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4.5 3.8 6.3v13.2L9 17.7l6 2 5.2-1.8V4.7L15 6.5z"/><path d="M9 4.5v13.2M15 6.5v13.2"/></symbol>
+  <symbol id="i-translate" viewBox="0 0 24 24"><path d="M4 5.5h9M8.5 3.5v2M11.2 5.5c-.8 3.5-3.2 6.2-6.4 7.7M6.6 8.7c1.2 1.8 2.9 3.1 4.8 3.9M13 20.5l3.8-9 3.8 9M14.4 17.3h4.8"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.7A2.6 2.6 0 0 1 6.6 6.1h1.7l1.5-2.1h4.4l1.5 2.1h1.7A2.6 2.6 0 0 1 20 8.7v8.2a2.6 2.6 0 0 1-2.6 2.6H6.6A2.6 2.6 0 0 1 4 16.9z"/><circle cx="12" cy="12.6" r="3.5"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.7-6.5-11.1a6.5 6.5 0 0 1 13 0C18.5 15.3 12 21 12 21z"/><circle cx="12" cy="9.9" r="2.4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.2 19.3 6v5.5c0 4.5-3.1 8.2-7.3 9.4-4.2-1.2-7.3-4.9-7.3-9.4V6z"/><path d="M12 8.6v5.2M9.4 11.2h5.2"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.4 12 4l8 6.4v8.8a1.6 1.6 0 0 1-1.6 1.6H15v-5.6H9v5.6H5.6A1.6 1.6 0 0 1 4 19.2z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7.5h9.5M18.5 7.5H20M4 16.5h3.5M12.5 16.5H20"/><circle cx="16" cy="7.5" r="2.4"/><circle cx="10" cy="16.5" r="2.4"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5.5M6.3 11.2 12 5.5l5.7 5.7"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2.4"/><path d="M15.5 8.5V6.4A2.4 2.4 0 0 0 13.1 4H6.4A2.4 2.4 0 0 0 4 6.4v6.7a2.4 2.4 0 0 0 2.4 2.4h2.1"/></symbol>
+  <symbol id="i-speaker" viewBox="0 0 24 24"><path d="M4 9.6h3.4L12 6v12l-4.6-3.6H4z"/><path d="M15.6 9.2a4 4 0 0 1 0 5.6M18.2 6.6a7.6 7.6 0 0 1 0 10.8"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+  <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r="1" /><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3"/></symbol>
+  <symbol id="i-hotel" viewBox="0 0 24 24"><path d="M3.5 18.5V6.5M3.5 14h17v4.5M20.5 14v-2.4A2.6 2.6 0 0 0 17.9 9H11v5"/><circle cx="7.3" cy="11.2" r="1.8"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 3.8h2.9l1.5 3.9-2 1.3a11 11 0 0 0 6 6l1.3-2 3.9 1.5v2.9a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 6a2 2 0 0 1 2-2.2z"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4.5h5.5V10M19.5 4.5l-8.3 8.3M17.5 14v4.2a1.6 1.6 0 0 1-1.6 1.6H5.8a1.6 1.6 0 0 1-1.6-1.6V8.1a1.6 1.6 0 0 1 1.6-1.6H10"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M5 8.5h13.5L15 5M19 15.5H5.5L9 19"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.8" y="4.8" width="16.4" height="14.4" rx="2.6"/><circle cx="9" cy="10" r="1.7"/><path d="M20.2 15.6 15.4 11l-8.6 8.2"/></symbol>
+  <symbol id="i-train" viewBox="0 0 24 24"><rect x="6" y="3.5" width="12" height="13" rx="3"/><path d="M6 10.5h12M9 19.5l-2 1.5M15 19.5l2 1.5"/><circle cx="9.2" cy="13.6" r=".6"/><circle cx="14.8" cy="13.6" r=".6"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4.5 9V4.5H9M19.5 9V4.5H15M4.5 15v4.5H9M19.5 15v4.5H15"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7.2h14M10 7.2V5.2h4v2M7 7.2l.8 11.6a1.6 1.6 0 0 0 1.6 1.5h5.2a1.6 1.6 0 0 0 1.6-1.5L17 7.2"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.3 4.3L19 7.2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.2"/><path d="M15.6 15.6 20 20"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4.2 21 19.5H3z"/><path d="M12 10v4.2M12 16.8h.01"/></symbol>
+</svg>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo-switch" viewBox="0 0 30 18"><rect x="1" y="1" width="28" height="16" rx="8" fill="#10223F"/><circle cx="21" cy="9" r="5" fill="#fff"/></symbol>
+</svg>
+
+<div class="app" id="app">
+  <header class="topbar" id="topbar">
+    <div class="brand" aria-label="TABISWITCH AI">
+      <svg class="brand-mark" aria-hidden="true"><use href="#logo-switch"/></svg>
+      <span class="brand-name">TABISWITCH<span>AI</span></span>
+    </div>
+    <button class="back" id="backBtn" type="button" aria-label="戻る">
+      <svg class="ic"><use href="#i-back"/></svg><span class="back-title" id="backTitle">戻る</span>
+    </button>
+    <button class="region-pill" id="regionPill" type="button" aria-label="国・都市を切り替える">
+      <span class="region-code" id="regionCode">TH</span><span id="regionCity">バンコク</span>
+    </button>
+    <a class="icon-btn" href="#more" aria-label="設定"><svg class="ic"><use href="#i-settings"/></svg></a>
+  </header>
+
+  <!-- ================= ホーム ================= -->
+  <main>
+  <section class="view" id="view-home" data-title="ホーム">
+    <div class="hero">
+      <h1>旅先で困ったことは<br>ありませんか？</h1>
+      <p id="heroSub">バンコクでの移動・食事・トラブルを、AIにそのまま相談できます。</p>
+    </div>
+    <form class="composer" id="homeForm" autocomplete="off">
+      <label for="homeInput" class="sr">AIに相談する内容</label>
+      <textarea id="homeInput" rows="1" placeholder="例：空港からホテルまでどう行く？" enterkeyhint="send"></textarea>
+      <button class="send-btn" type="submit" aria-label="送信"><svg class="ic"><use href="#i-send"/></svg></button>
+    </form>
+    <div class="chips" id="homeChips"></div>
+
+    <h2 class="sec-title">機能</h2>
+    <div class="features">
+      <a class="feature" href="#chat"><span class="f-ic"><svg class="ic"><use href="#i-chat"/></svg></span><strong>AI旅行相談</strong><small>移動・食事・トラブルをまとめて相談</small></a>
+      <a class="feature" href="#map"><span class="f-ic"><svg class="ic"><use href="#i-map"/></svg></span><strong>地図・移動</strong><small>今いる場所から地図アプリで経路検索</small></a>
+      <a class="feature" href="#translate"><span class="f-ic"><svg class="ic"><use href="#i-translate"/></svg></span><strong>翻訳</strong><small>文章と定番フレーズ、読み上げ</small></a>
+      <a class="feature" href="#photo"><span class="f-ic"><svg class="ic"><use href="#i-camera"/></svg></span><strong>写真翻訳</strong><small>メニューや看板を撮って日本語に</small></a>
+      <a class="feature" href="#spots"><span class="f-ic"><svg class="ic"><use href="#i-pin"/></svg></span><strong>観光スポット</strong><small>カテゴリ別に地図アプリで探す</small></a>
+      <a class="feature danger" href="#emergency"><span class="f-ic"><svg class="ic"><use href="#i-shield"/></svg></span><strong>緊急サポート</strong><small>紛失・盗難・急病の最初の行動</small></a>
+    </div>
+
+    <div id="homeHotel"></div>
+    <p class="footer-note">AIの回答は参考情報です。運賃・営業時間・運行状況は、必ず公式情報や地図アプリで確認してください。</p>
+  </section>
+
+  <!-- ================= AI相談 ================= -->
+  <section class="view" id="view-chat" data-title="AI相談">
+    <div id="chatModeTag"></div>
+    <div class="chat-log" id="chatLog" aria-live="polite"></div>
+    <div class="chat-dock">
+      <div class="chat-tools">
+        <button class="chip" type="button" id="attachLocBtn"><svg class="ic"><use href="#i-locate"/></svg><span>現在地を添える</span></button>
+        <a class="chip" href="#photo"><svg class="ic"><use href="#i-camera"/></svg>写真を翻訳</a>
+        <button class="chip" type="button" id="newChatBtn"><svg class="ic"><use href="#i-plus"/></svg>新しい会話</button>
+      </div>
+      <form class="composer" id="chatForm" autocomplete="off">
+        <label for="chatInput" class="sr">メッセージ</label>
+        <textarea id="chatInput" rows="1" placeholder="困っていることを入力" enterkeyhint="send"></textarea>
+        <button class="send-btn" type="submit" id="chatSend" aria-label="送信"><svg class="ic"><use href="#i-send"/></svg></button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= 地図・移動 ================= -->
+  <section class="view" id="view-map" data-title="地図・移動">
+    <p class="view-intro">出発地と目的地を入れると、地図アプリで実際の経路と所要時間を確認できます。</p>
+
+    <div class="card">
+      <h3>出発地</h3>
+      <button class="btn btn-soft btn-block" type="button" id="locateBtn"><svg class="ic"><use href="#i-locate"/></svg><span>現在地を取得する</span></button>
+      <div id="locStatus"></div>
+      <div class="field" style="margin:14px 0 0">
+        <label for="originInput">現在地が使えないときは手入力</label>
+        <input class="input" id="originInput" placeholder="例：Siam駅、ホテル名など" enterkeyhint="next">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>目的地</h3>
+      <div class="field" style="margin-bottom:10px">
+        <label for="destInput" class="sr">目的地</label>
+        <input class="input" id="destInput" placeholder="例：ワット・アルン、明洞駅" enterkeyhint="go">
+      </div>
+      <div class="chips" id="destChips" style="margin-top:0"></div>
+      <h3 style="margin-top:18px">移動手段</h3>
+      <div class="seg" id="modeSeg" role="radiogroup" aria-label="移動手段">
+        <button type="button" data-mode="walking" role="radio">徒歩</button>
+        <button type="button" data-mode="train" role="radio" class="on">電車</button>
+        <button type="button" data-mode="bus" role="radio">バス</button>
+        <button type="button" data-mode="taxi" role="radio">タクシー</button>
+      </div>
+      <p class="note" id="modeNote" style="margin:10px 2px 0"></p>
+      <div class="stack" style="margin-top:14px" id="routeBtns"></div>
+    </div>
+
+    <h2 class="sec-title">交通機関の公式情報</h2>
+    <div class="card"><div class="link-list" id="transportList"></div><p class="note" id="transportNote" style="margin:10px 0 0"></p></div>
+    <div class="stack" style="margin-top:12px">
+      <button class="btn btn-line btn-block" type="button" data-ask="airport"><svg class="ic"><use href="#i-chat"/></svg>空港から市内への行き方をAIに聞く</button>
+      <button class="btn btn-line btn-block" type="button" data-ask="taxi"><svg class="ic"><use href="#i-chat"/></svg>タクシーで損しないコツをAIに聞く</button>
+    </div>
+  </section>
+
+  <!-- ================= 翻訳 ================= -->
+  <section class="view" id="view-translate" data-title="翻訳">
+    <div class="lang-bar">
+      <label class="sr" for="fromLang">翻訳元</label>
+      <select class="select" id="fromLang"></select>
+      <button class="swap" type="button" id="swapLang" aria-label="言語を入れ替える"><svg class="ic"><use href="#i-swap"/></svg></button>
+      <label class="sr" for="toLang">翻訳先</label>
+      <select class="select" id="toLang"></select>
+    </div>
+    <label class="sr" for="transInput">翻訳する文章</label>
+    <textarea class="textarea" id="transInput" placeholder="翻訳したい文章を入力"></textarea>
+    <button class="btn btn-primary btn-block" type="button" id="transBtn" style="margin-top:10px"><span>翻訳する</span></button>
+    <div id="transResult"></div>
+
+    <h2 class="sec-title">よく使うフレーズ</h2>
+    <p class="note" style="margin:-4px 2px 8px">タップすると大きく表示します。オフラインでも使えます。</p>
+    <div class="card" style="padding:4px 14px"><div id="phraseList"></div></div>
+  </section>
+
+  <!-- ================= 写真翻訳 ================= -->
+  <section class="view" id="view-photo" data-title="写真翻訳">
+    <p class="view-intro">メニュー・看板・駅の案内・券売機などを撮影すると、AIが文字を読み取り日本語で説明します。</p>
+    <input type="file" id="camInput" accept="image/*" capture="environment" class="hidden">
+    <input type="file" id="libInput" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,image/*" class="hidden">
+
+    <div id="photoEmpty">
+      <div class="drop"><svg class="ic"><use href="#i-camera"/></svg><span>写真がまだありません</span></div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-primary" type="button" id="camBtn"><svg class="ic"><use href="#i-camera"/></svg>撮影する</button>
+        <button class="btn btn-soft" type="button" id="libBtn"><svg class="ic"><use href="#i-image"/></svg>写真を選ぶ</button>
+      </div>
+    </div>
+
+    <div id="photoReady" class="hidden">
+      <div class="preview-wrap">
+        <img id="photoPreview" alt="送信予定の写真">
+        <button class="preview-del" type="button" id="photoDel" aria-label="写真を削除"><svg class="ic"><use href="#i-trash"/></svg></button>
+      </div>
+      <p class="preview-meta" id="photoMeta"></p>
+      <h3 style="font-size:15px;margin:16px 2px 8px">何の写真ですか？</h3>
+      <div class="chips" id="photoKinds" style="margin-top:0"></div>
+      <div class="field" style="margin-top:14px">
+        <label for="photoAsk">AIへの追加の質問（任意）</label>
+        <input class="input" id="photoAsk" placeholder="例：辛くない料理はどれ？">
+      </div>
+      <div class="warn"><svg class="ic"><use href="#i-warn"/></svg><span>パスポート、クレジットカード、顔がはっきり写った人物など、個人情報が写っていないか確認してから送信してください。写真はAIの処理のためGoogleのGemini APIに送信されます。</span></div>
+      <button class="btn btn-primary btn-block" type="button" id="photoSend"><span>内容を確認して翻訳する</span></button>
+    </div>
+    <div id="photoResult"></div>
+  </section>
+
+  <!-- ================= 観光スポット ================= -->
+  <section class="view" id="view-spots" data-title="観光スポット">
+    <p class="view-intro">カテゴリを選ぶと、地図アプリで実際のお店やスポットを検索します。評価や営業時間は地図アプリで確認できます。</p>
+    <div class="chips" id="spotCats" style="margin-top:0"></div>
+    <div class="card" style="margin-top:16px">
+      <div class="field">
+        <label for="spotArea">エリア・駅名（任意）</label>
+        <input class="input" id="spotArea" placeholder="例：スクンビット、弘大入口駅">
+      </div>
+      <label class="row" style="gap:12px;min-height:44px;font-size:15px">
+        <input type="checkbox" id="spotNear" style="width:22px;height:22px;accent-color:#10223F">
+        <span>現在地の周辺で探す</span>
+      </label>
+      <div id="spotLocStatus"></div>
+      <div class="stack" style="margin-top:14px" id="spotBtns"></div>
+    </div>
+    <button class="btn btn-line btn-block" type="button" id="spotAsk" style="margin-top:12px"><svg class="ic"><use href="#i-chat"/></svg><span>探し方をAIに相談する</span></button>
+    <p class="footer-note">このアプリはお店の評価・営業時間を独自に保持していません。表示は地図サービスの検索結果です。</p>
+  </section>
+
+  <!-- ================= 緊急サポート ================= -->
+  <section class="view" id="view-emergency" data-title="緊急サポート">
+    <p class="view-intro">まず身の安全を確保してください。命に関わるときは、迷わず緊急番号へ電話してください。</p>
+    <div class="sos-grid" id="sosGrid"></div>
+    <div class="card" style="margin-top:12px">
+      <h3>日本の公的窓口</h3>
+      <div class="link-list" id="embassyList"></div>
+    </div>
+    <h2 class="sec-title">トラブル別の最初の行動</h2>
+    <div class="card" style="padding:4px 16px" id="troubleList"></div>
+    <p class="footer-note" id="sosSource"></p>
+  </section>
+
+  <!-- ================= その他 ================= -->
+  <section class="view" id="view-more" data-title="その他・設定">
+    <h2 class="sec-title" style="margin-top:8px">国・都市</h2>
+    <div id="regionInline"></div>
+
+    <h2 class="sec-title">ホテル情報</h2>
+    <div class="card" id="hotelCard"></div>
+
+    <h2 class="sec-title">ほかの機能</h2>
+    <div class="card" style="padding:4px 16px">
+      <div class="link-list">
+        <a class="link-item" href="#photo"><svg class="ic" style="color:var(--navy)"><use href="#i-camera"/></svg><div class="li-main"><b>写真翻訳</b><span>メニュー・看板・駅の案内を読み取る</span></div><svg class="ic"><use href="#i-chev"/></svg></a>
+        <a class="link-item" href="#spots"><svg class="ic" style="color:var(--navy)"><use href="#i-pin"/></svg><div class="li-main"><b>観光スポット</b><span>カテゴリ別に地図アプリで検索</span></div><svg class="ic"><use href="#i-chev"/></svg></a>
+        <a class="link-item" href="#emergency"><svg class="ic" style="color:var(--danger)"><use href="#i-shield"/></svg><div class="li-main"><b>緊急サポート</b><span>緊急番号とトラブル別の対応</span></div><svg class="ic"><use href="#i-chev"/></svg></a>
+        <a class="link-item" href="#map"><svg class="ic" style="color:var(--navy)"><use href="#i-train"/></svg><div class="li-main"><b>交通案内</b><span>公式サイトと地図アプリへのリンク</span></div><svg class="ic"><use href="#i-chev"/></svg></a>
+      </div>
+    </div>
+
+    <h2 class="sec-title">データとプライバシー</h2>
+    <div class="card">
+      <p class="note" style="margin:0 0 12px">この端末に保存しているのは「選択中の国・都市」と「ホテル情報」だけです。AI相談の会話と写真は保存せず、ページを閉じると消えます。AIへの質問と写真は、回答作成のためGoogleのGemini APIに送信されます。</p>
+      <div id="dataStatus" class="note" style="margin-bottom:12px"></div>
+      <button class="btn btn-line btn-block" type="button" id="clearData"><svg class="ic"><use href="#i-trash"/></svg>保存したデータをすべて削除</button>
+    </div>
+    <p class="footer-note">TABISWITCH AI v1.0<br>運賃・営業時間・運行状況・緊急連絡先は変わることがあります。重要な情報は必ず公式情報で確認してください。</p>
+  </section>
+  </main>
+</div>
+
+<!-- 下部ナビゲーション -->
+<nav class="tabbar" aria-label="メインメニュー">
+  <div class="tabbar-in">
+    <a class="tab" href="#home" data-tab="home"><svg class="ic"><use href="#i-home"/></svg>ホーム</a>
+    <a class="tab" href="#chat" data-tab="chat"><svg class="ic"><use href="#i-chat"/></svg>AI相談</a>
+    <a class="tab" href="#map" data-tab="map"><svg class="ic"><use href="#i-map"/></svg>地図</a>
+    <a class="tab" href="#translate" data-tab="translate"><svg class="ic"><use href="#i-translate"/></svg>翻訳</a>
+    <a class="tab" href="#more" data-tab="more"><svg class="ic"><use href="#i-more"/></svg>その他</a>
+  </div>
+</nav>
+
+<!-- 国・都市の切り替えシート -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="regionSheet" role="dialog" aria-modal="true" aria-labelledby="regionSheetTitle">
+  <div class="grab"></div>
+  <h2 id="regionSheetTitle">国・都市を切り替える</h2>
+  <p class="note" style="margin:0">翻訳の言語、交通情報、地図サービス、AIへの相談内容が切り替わります。</p>
+  <div id="regionSheetList"></div>
+  <button class="btn btn-soft btn-block" type="button" id="sheetClose" style="margin-top:16px">閉じる</button>
+</div>
+
+<!-- 写真送信の確認シート -->
+<div class="sheet" id="confirmSheet" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="grab"></div>
+  <h2 id="confirmTitle">この写真をAIに送信しますか？</h2>
+  <div class="row" style="margin:14px 0;align-items:flex-start">
+    <img id="confirmThumb" alt="" style="width:92px;height:92px;object-fit:cover;border-radius:14px;flex:none">
+    <p class="note" style="margin:0">写真は翻訳のためGoogleのGemini APIに送信されます。パスポート・カード番号・他人の顔など、送りたくないものが写っていないか確認してください。</p>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-soft" type="button" id="confirmCancel">やめる</button>
+    <button class="btn btn-primary" type="button" id="confirmOk">送信する</button>
+  </div>
+</div>
+
+<!-- 現地の人に見せる全画面 -->
+<div class="show-screen" id="showScreen" role="dialog" aria-modal="true" aria-label="相手に見せる画面">
+  <div class="ss-top"><span id="ssHint">この画面を相手に見せてください</span><button class="ss-close" type="button" id="ssClose" aria-label="閉じる"><svg class="ic"><use href="#i-close"/></svg></button></div>
+  <div class="ss-body" id="ssBody"></div>
+  <div class="ss-actions" id="ssActions"></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ============================================================
+   1. 地域データ（国を追加するときは REGIONS に1件足すだけ）
+   ============================================================ */
+const API_URL = '/.netlify/functions/travel-assistant';
+const STORE_REGION = 'tabiswitch.region.v1';
+const STORE_HOTEL = 'tabiswitch.hotel.v1';
+
+const REGIONS = {
+  th: {
+    key: 'th', code: 'TH', country: 'タイ', city: 'バンコク', dataFile: 'data/thailand.json',
+    lang: { id: 'th', name: 'タイ語', tts: 'th-TH' },
+    maps: ['google'],
+    examples: ['空港からホテルまでどうやって行く？', 'BTSの乗り方が分からない', 'タクシーでぼったくられない方法は？', '明日のバンコク観光プランを考えて', 'おすすめのお土産は？', 'この近くで辛くない料理を食べたい'],
+    placeholders: { origin: '例：サイアム駅、ホテル名など', dest: '例：ワット・アルン', area: '例：スクンビット、シーロム' },
+    destChips: ['スワンナプーム国際空港', 'ドンムアン空港', 'サイアム駅', 'ワット・アルン'],
+    transport: [
+      { name: 'BTS（スカイトレイン）', desc: '路線図・運賃・運行情報（公式）', url: 'https://www.bts.co.th/' },
+      { name: 'MRT（地下鉄）', desc: 'ブルーライン・パープルライン（公式）', url: 'https://metro.bemplc.co.th/' },
+      { name: 'エアポート・レイル・リンク', desc: 'スワンナプーム空港と市内を結ぶ鉄道（公式）', url: 'https://www.srtet.co.th/' },
+      { name: 'スワンナプーム国際空港', desc: '空港からの交通手段（公式）', url: 'https://suvarnabhumi.airportthai.co.th/' }
+    ],
+    taxiNote: 'タクシーは「メーターで」と伝えるのが基本です。配車アプリ（Grab、Boltなど）は乗車前に料金の目安を確認できます。料金は必ずアプリや車内表示で確認してください。',
+    emergency: [
+      { num: '191', label: '警察・総合緊急' },
+      { num: '1669', label: '救急車' },
+      { num: '1155', label: 'ツーリストポリス（英語対応）', calm: true },
+      { num: '199', label: '消防' },
+      { num: '1672', label: 'タイ国政府観光庁ホットライン', calm: true }
+    ],
+    emergencySource: '緊急番号は英国政府・在タイ各国大使館の公開情報で確認（2026年11月）。',
+    embassy: { name: '在タイ日本国大使館', url: 'https://www.th.emb-japan.go.jp/' },
+    policeHint: 'タイでは警察 191、英語で相談しやすいツーリストポリス 1155 があります。',
+    driverLine: 'ไปที่โรงแรมนี้ครับ/ค่ะ',
+    driverRead: 'パイ ティー ローンレーム ニー クラップ/カー',
+    phrases: [
+      ['こんにちは', 'สวัสดีครับ/ค่ะ', 'サワッディー クラップ/カー', 'Hello'],
+      ['ありがとうございます', 'ขอบคุณครับ/ค่ะ', 'コップクン クラップ/カー', 'Thank you'],
+      ['これはいくらですか？', 'อันนี้ราคาเท่าไหร่ครับ/คะ', 'アンニー ラーカー タオライ クラップ/カ', 'How much is this?'],
+      ['トイレはどこですか？', 'ห้องน้ำอยู่ที่ไหนครับ/คะ', 'ホンナーム ユー ティーナイ クラップ/カ', 'Where is the restroom?'],
+      ['駅はどこですか？', 'สถานีรถไฟฟ้าอยู่ที่ไหนครับ/คะ', 'サターニー ロットファイファー ユー ティーナイ', 'Where is the station?'],
+      ['ホテルまで行きたいです', 'อยากไปโรงแรมครับ/ค่ะ', 'ヤーク パイ ローンレーム クラップ/カー', 'I want to go to my hotel.'],
+      ['これをください', 'ขออันนี้ครับ/ค่ะ', 'コー アンニー クラップ/カー', 'This one, please.'],
+      ['辛くしないでください', 'ไม่เผ็ดนะครับ/คะ', 'マイ ペット ナ クラップ/カ', 'Not spicy, please.'],
+      ['助けてください', 'ช่วยด้วยครับ/ค่ะ', 'チュアイ ドゥアイ クラップ/カー', 'Help me, please!'],
+      ['日本語を話せる人はいますか？', 'มีใครพูดภาษาญี่ปุ่นได้ไหมครับ/คะ', 'ミー クライ プート パーサー イープン ダイ マイ', 'Does anyone speak Japanese?']
+    ],
+    notes: '運賃・運行時間・運休情報は各交通機関の公式情報で確認してください。'
+  },
+  kr: {
+    key: 'kr', code: 'KR', country: '韓国', city: 'ソウル', dataFile: 'data/korea.json',
+    lang: { id: 'ko', name: '韓国語', tts: 'ko-KR' },
+    maps: ['naver', 'kakao', 'google'],
+    examples: ['仁川空港からホテルまでどうやって行く？', '地下鉄の乗り方が分からない', 'T-moneyって何？', '明日のソウル観光プランを考えて', 'おすすめのお土産は？', '現地の人に道を聞きたい'],
+    placeholders: { origin: '例：ソウル駅、ホテル名など', dest: '例：景福宮、明洞駅', area: '例：弘大入口駅、聖水' },
+    destChips: ['仁川国際空港', '金浦空港', 'ソウル駅', '明洞駅'],
+    transport: [
+      { name: 'Naver Map', desc: '地下鉄・バスの経路検索に強い地図アプリ', url: 'https://map.naver.com/' },
+      { name: 'KakaoMap', desc: '経路検索・周辺検索ができる地図アプリ', url: 'https://map.kakao.com/' },
+      { name: 'ソウル交通公社（Seoul Metro）', desc: '地下鉄の運行情報（公式）', url: 'http://www.seoulmetro.co.kr/' },
+      { name: '空港鉄道 AREX', desc: '仁川・金浦空港とソウル駅を結ぶ鉄道（公式）', url: 'https://www.arex.or.kr/' },
+      { name: '仁川国際空港', desc: '空港からの交通手段（公式）', url: 'https://www.airport.kr/' }
+    ],
+    taxiNote: 'タクシーは配車アプリ（Kakao Tなど）を使うと行き先の伝え間違いを減らせます。料金はメーターまたはアプリの表示で確認してください。',
+    emergency: [
+      { num: '112', label: '警察（通訳対応あり）' },
+      { num: '119', label: '救急・消防' },
+      { num: '1330', label: '観光案内（多言語・三者通話）', calm: true }
+    ],
+    emergencySource: '緊急番号は英国政府・在韓各国大使館の公開情報で確認（2026年11月）。',
+    embassy: { name: '在大韓民国日本国大使館', url: 'https://www.kr.emb-japan.go.jp/' },
+    policeHint: '韓国では警察 112（通訳対応あり）。言葉が不安なときは観光案内 1330 が三者通話で通訳してくれます。',
+    driverLine: '이 호텔로 가 주세요',
+    driverRead: 'イ ホテルロ カ ジュセヨ',
+    phrases: [
+      ['こんにちは', '안녕하세요', 'アンニョンハセヨ', 'Hello'],
+      ['ありがとうございます', '감사합니다', 'カムサハムニダ', 'Thank you'],
+      ['これはいくらですか？', '이거 얼마예요?', 'イゴ オルマエヨ？', 'How much is this?'],
+      ['トイレはどこですか？', '화장실이 어디예요?', 'ファジャンシリ オディエヨ？', 'Where is the restroom?'],
+      ['駅はどこですか？', '역이 어디예요?', 'ヨギ オディエヨ？', 'Where is the station?'],
+      ['ホテルまで行きたいです', '호텔까지 가고 싶어요', 'ホテルッカジ カゴ シポヨ', 'I want to go to my hotel.'],
+      ['これをください', '이거 주세요', 'イゴ ジュセヨ', 'This one, please.'],
+      ['辛くしないでください', '안 맵게 해 주세요', 'アン メプケ ヘ ジュセヨ', 'Not spicy, please.'],
+      ['助けてください', '도와주세요!', 'トワジュセヨ！', 'Help me, please!'],
+      ['日本語を話せる人はいますか？', '일본어 할 수 있는 분 계세요?', 'イルボノ ハル ス インヌン ブン ケセヨ？', 'Does anyone speak Japanese?']
+    ],
+    notes: '運賃・運行時間・運休情報は公式情報や現地地図サービスで確認してください。'
+  }
+};
+const REGION_ORDER = ['th', 'kr'];
+
+const COMMON_LINKS = [
+  { name: '外務省 海外安全ホームページ', desc: '国別の安全情報・緊急時の連絡先', url: 'https://www.anzen.mofa.go.jp/' },
+  { name: 'たびレジ（外務省）', desc: '渡航先の緊急情報をメールで受け取る', url: 'https://www.ezairyu.mofa.go.jp/tabireg/' }
+];
+
+const SPOT_CATS = [
+  { id: 'sight', label: '観光地', en: 'tourist attractions', ko: '관광지' },
+  { id: 'food', label: '飲食店', en: 'restaurants', ko: '맛집' },
+  { id: 'cafe', label: 'カフェ', en: 'cafe', ko: '카페' },
+  { id: 'shop', label: 'ショッピング', en: 'shopping', ko: '쇼핑' },
+  { id: 'night', label: '夜景', en: 'night view', ko: '야경 명소' },
+  { id: 'act', label: 'アクティビティ', en: 'activities', ko: '체험' },
+  { id: 'local', label: '現地の人気スポット', en: 'popular local spots', ko: '핫플레이스' }
+];
+
+const PHOTO_KINDS = [
+  { id: 'menu', label: 'メニュー', prompt: 'このメニューを日本語に翻訳して。料理の特徴も説明して。' },
+  { id: 'sign', label: '看板・注意書き', prompt: 'この看板・注意書きを日本語に翻訳して、意味と旅行者が気をつけることを説明して。' },
+  { id: 'station', label: '駅・券売機・バス停', prompt: 'この駅の案内・券売機・バス停の表示を日本語に翻訳して、操作や見方を説明して。' },
+  { id: 'product', label: '商品パッケージ', prompt: 'この商品パッケージを日本語に翻訳して、何の商品か・使い方・注意書きを説明して。' },
+  { id: 'other', label: 'その他', prompt: 'この写真の文字を日本語に翻訳して、内容を説明して。' }
+];
+const PHOTO_BASE_PROMPT = '画像内の文字を読み取り、日本語に翻訳してください。料理の場合は料理名・材料・味の特徴を説明してください。価格が読み取れる場合は価格も表示してください。読めない文字は推測せず、不明と明示してください。';
+
+const TROUBLES = [
+  { id: 'passport', title: 'パスポート紛失', steps: [
+    '泊まっているホテルや、最後に立ち寄った店・交通機関に落とし物がないか確認する。',
+    '見つからなければ現地の警察で紛失（盗難）の届出をし、届出の証明書を受け取る。',
+    '日本大使館・領事館に連絡し、新しい旅券または「帰国のための渡航書」の手続きと必要書類を確認する。',
+    '航空会社・旅行会社・海外旅行保険の窓口に連絡し、帰国便や補償について相談する。'
+  ], ask: 'パスポートをなくしました。何から順番にすればいいですか？' },
+  { id: 'wallet', title: '財布・カード紛失', steps: [
+    'すぐにカード会社の紛失・盗難窓口に連絡し、カードを利用停止にする（番号はカード会社の公式サイトで確認）。',
+    '現地の警察で届出をし、証明書を受け取る（保険請求に必要になることが多い）。',
+    '海外旅行保険の窓口に連絡し、補償の対象と手続きを確認する。',
+    '当面の現金が必要なら、ホテルのフロントや家族、旅行会社に相談する。'
+  ], ask: '財布とクレジットカードをなくしました。どうすればいいですか？' },
+  { id: 'theft', title: '盗難', steps: [
+    'まず安全な場所へ移動する。犯人を追いかけない。',
+    '現地の警察に届出をし、盗難証明書を受け取る。',
+    'カードが含まれていれば利用停止、パスポートなら大使館・領事館へ連絡する。',
+    '海外旅行保険の窓口に連絡する。'
+  ], ask: '盗難にあいました。警察での伝え方も含めて教えてください。' },
+  { id: 'sick', title: '体調不良', steps: [
+    '意識がない・呼吸が苦しいなど重い症状なら、ためらわず救急番号に電話する。',
+    '海外旅行保険のサポートデスクに連絡し、受診できる病院やキャッシュレス受診の可否を確認する。',
+    'ホテルのフロントに相談し、病院への行き方やタクシーの手配を頼む。',
+    '受診時はパスポートと保険証券を持参し、症状や持病・服用中の薬を伝える。'
+  ], ask: '体調が悪いです。病院に行くべきか、受診の流れを教えてください。' },
+  { id: 'injury', title: 'けが', steps: [
+    '出血が多い・動けないなど重いときは救急番号に電話する。',
+    '安全な場所に移動し、可能なら傷口を清潔な布で押さえる。',
+    '海外旅行保険のサポートデスクに連絡し、受診先を確認する。',
+    '事故の場合は警察にも届出をし、相手の連絡先や現場の写真を記録する。'
+  ], ask: 'けがをしました。どこで受診すればいいですか？' },
+  { id: 'transit', title: '交通機関のトラブル', steps: [
+    '安全な場所に移動し、駅員・乗務員・運転手に状況を伝える。',
+    '運行状況は交通機関の公式サイトや地図アプリで確認する。',
+    '代わりの移動手段を地図アプリで探す。急ぎならタクシーや配車アプリも検討する。',
+    '忘れ物はその路線・会社の遺失物窓口に問い合わせる。'
+  ], ask: '電車が止まって移動できません。どうすればいいですか？' },
+  { id: 'hotel', title: 'ホテルとのトラブル', steps: [
+    'フロントに落ち着いて状況を伝え、対応を記録する（担当者名・時刻）。',
+    '予約確認書・領収書・やり取りのメッセージを保存しておく。',
+    '予約サイトや旅行会社のサポート窓口に連絡する。',
+    '解決しない場合は観光案内のホットラインに相談する。'
+  ], ask: 'ホテルとトラブルになりました。伝え方を現地語でも教えてください。' },
+  { id: 'police', title: '警察への相談', steps: [
+    '緊急時は警察の緊急番号に電話する。',
+    '言葉が不安なときは、英語対応・通訳サービスのある窓口を使う。',
+    '被害の日時・場所・内容・盗まれた物をメモしてから届け出る。',
+    '届出の証明書（被害届の控え）を必ず受け取る。'
+  ], ask: '警察に被害を届けたいです。伝えるべきことを現地語の例文つきで教えてください。' },
+  { id: 'embassy', title: '大使館・領事館への相談', steps: [
+    '大使館の公式サイトで、連絡先と受付時間を確認する。',
+    'パスポートの紛失、事件・事故、逮捕・拘束などは大使館・領事館に相談できる。',
+    'パスポート番号の控えや身分証明になるものを手元に用意する。',
+    '日本の家族にも状況を連絡しておく。'
+  ], ask: '大使館・領事館にはどんなことを相談できますか？' }
+];
+
+/* ============================================================
+   2. 状態とユーティリティ
+   ============================================================ */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const icon = (id, cls = 'ic') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+
+const store = {
+  get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
+  set(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch { return false; } },
+  del(key) { try { localStorage.removeItem(key); } catch {} }
+};
+
+const state = {
+  region: REGIONS[store.get(STORE_REGION, 'th')] ? store.get(STORE_REGION, 'th') : 'th',
+  history: [],          // {role:'user'|'model', content}
+  chatMode: 'general',
+  busy: false,
+  pos: null,            // {lat,lng,acc,time}
+  travelMode: 'train',
+  photo: null,          // {dataUrl, w, h, bytes}
+  photoKind: 'menu',
+  spotCat: 'sight',
+  trans: { from: 'ja', to: null },
+  dataStatus: 'loading'
+};
+const R = () => REGIONS[state.region];
+
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else { throw new Error('no clipboard'); }
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+    let ok = false; try { ok = document.execCommand('copy'); } catch {}
+    ta.remove();
+    if (!ok) { toast('コピーできませんでした。長押しで選択してください'); return; }
+  }
+  toast('コピーしました');
+}
+
+function speak(text, langTag) {
+  if (!('speechSynthesis' in window)) { toast('この端末は読み上げに対応していません'); return; }
+  const synth = window.speechSynthesis;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = langTag; u.rate = 0.9;
+  const voices = synth.getVoices();
+  const prefix = langTag.slice(0, 2);
+  const v = voices.find(v => v.lang === langTag) || voices.find(v => v.lang && v.lang.startsWith(prefix));
+  if (v) u.voice = v;
+  else if (voices.length) toast('端末に読み上げ用の音声がない可能性があります');
+  u.onerror = () => toast('読み上げできませんでした');
+  synth.speak(u);
+}
+
+const LANGS = () => ({
+  ja: { name: '日本語', tts: 'ja-JP', label: '日本語' },
+  local: { name: R().lang.name, tts: R().lang.tts, label: R().lang.name },
+  en: { name: '英語', tts: 'en-US', label: '英語' }
+});
+
+/* ---------- AIの回答を安全にHTML化（簡易マークダウン） ---------- */
+function inlineMd(s) {
+  const tokens = [];
+  const keep = html => { tokens.push(html); return `\u0000${tokens.length - 1}\u0000`; };
+  let t = esc(s);
+  t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, txt, url) => keep(`<a href="${url}" target="_blank" rel="noopener noreferrer">${txt}</a>`));
+  t = t.replace(/https?:\/\/[^\s<>"'（）()「」、。]+/g, url => keep(`<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`));
+  t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+  return t.replace(/\u0000(\d+)\u0000/g, (_, i) => tokens[Number(i)]);
+}
+function renderMd(src) {
+  const lines = String(src).replace(/\r/g, '').split('\n');
+  let html = '', list = null;
+  const close = () => { if (list) { html += `</${list}>`; list = null; } };
+  for (const raw of lines) {
+    const line = raw.replace(/\s+$/, '');
+    let m;
+    if (!line.trim()) { close(); continue; }
+    if (/^\s*(-{3,}|\*{3,})\s*$/.test(line)) { close(); continue; }
+    if ((m = line.match(/^#{1,6}\s+(.*)$/))) { close(); html += `<h4>${inlineMd(m[1])}</h4>`; continue; }
+    if ((m = line.match(/^\s*[-*・•]\s+(.*)$/))) { if (list !== 'ul') { close(); html += '<ul>'; list = 'ul'; } html += `<li>${inlineMd(m[1])}</li>`; continue; }
+    if ((m = line.match(/^\s*(\d+)[.)．]\s+(.*)$/))) { if (list !== 'ol') { close(); html += '<ol>'; list = 'ol'; } html += `<li>${inlineMd(m[2])}</li>`; continue; }
+    close(); html += `<p>${inlineMd(line)}</p>`;
+  }
+  close();
+  return html;
+}
+const plainText = src => String(src).replace(/\*\*([^*]+)\*\*/g, '$1').replace(/^#{1,6}\s+/gm, '').replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g, '$1 $2');
+
+/* ============================================================
+   3. AI通信（Netlify Functions経由・APIキーはサーバー側）
+   ============================================================ */
+async function callAI({ mode = 'general', messages, image = null }) {
+  const body = { country: R().country, city: R().city, mode, messages };
+  if (image) body.image = { mimeType: 'image/jpeg', data: image };
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 65000);
+  let res;
+  try {
+    res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: ctrl.signal
+    });
+  } catch (e) {
+    clearTimeout(timer);
+    if (e.name === 'AbortError') throw new Error('AIの応答に時間がかかりすぎました。電波の良い場所で、もう一度お試しください。');
+    if (!navigator.onLine) throw new Error('インターネットに接続されていません。Wi-Fiやモバイル通信を確認してください。');
+    throw new Error('AIに接続できませんでした。通信状況を確認して、もう一度お試しください。');
+  }
+  clearTimeout(timer);
+  let data = null;
+  try { data = await res.json(); } catch {}
+  if (!data) {
+    if (res.status === 404) throw new Error('AIの接続先が見つかりません。Netlifyに公開したURLで開いているか、Functionsがデプロイされているか確認してください。');
+    if (res.status === 413) throw new Error('送信データが大きすぎます。別の写真でお試しください。');
+    if (res.status === 502 || res.status === 504) throw new Error('AIの応答が時間内に返ってきませんでした。少し待ってからもう一度お試しください。');
+    throw new Error(`AIから正しい応答を受け取れませんでした（エラー ${res.status}）。`);
+  }
+  if (res.status === 429) throw new Error(data.error || '無料利用枠の上限に達した可能性があります。時間をおいて再度お試しください。');
+  if (!res.ok || !data.ok) throw new Error(data.error || `AIとの通信に失敗しました（エラー ${res.status}）。`);
+  return data.reply;
+}
+
+function setBusy(on) {
+  state.busy = on;
+  $$('[data-busy-lock]').forEach(b => { b.disabled = on; });
+  $('#chatSend').disabled = on;
+  $('#homeForm .send-btn').disabled = on;
+}
+
+/* ============================================================
+   4. ルーティング（ハッシュで画面を切り替え・戻る操作に対応）
+   ============================================================ */
+const VIEWS = ['home', 'chat', 'map', 'translate', 'photo', 'spots', 'emergency', 'more'];
+const TAB_OF = { home: 'home', chat: 'chat', map: 'map', translate: 'translate', more: 'more', photo: 'home', spots: 'home', emergency: 'home' };
+let navCount = 0;
+
+function route() {
+  let v = (location.hash || '#home').slice(1);
+  if (!VIEWS.includes(v)) v = 'home';
+  $$('.view').forEach(el => el.classList.toggle('active', el.id === `view-${v}`));
+  $$('.tab').forEach(el => {
+    const on = el.dataset.tab === TAB_OF[v] && !['photo', 'spots', 'emergency'].includes(v);
+    el.classList.toggle('on', on);
+    if (on) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
+  });
+  const top = $('#topbar');
+  top.classList.toggle('sub', v !== 'home');
+  $('#backTitle').textContent = $(`#view-${v}`).dataset.title;
+  window.scrollTo(0, 0);
+  if (v === 'chat') { renderChat(); }
+  if (v === 'more') { renderMore(); }
+}
+window.addEventListener('hashchange', () => { navCount++; route(); });
+$('#backBtn').addEventListener('click', () => {
+  if (navCount > 0 && history.length > 1) history.back();
+  else location.hash = '#home';
+});
+window.addEventListener('scroll', () => $('#topbar').classList.toggle('scrolled', window.scrollY > 4), { passive: true });
+
+/* ============================================================
+   5. 国・都市の切り替え
+   ============================================================ */
+function regionOptionsHtml() {
+  return REGION_ORDER.map(k => {
+    const r = REGIONS[k];
+    return `<button class="region-opt ${k === state.region ? 'on' : ''}" type="button" data-region="${k}">
+      <span class="region-code">${r.code}</span>
+      <span style="flex:1"><b>${esc(r.country)}／${esc(r.city)}</b><span>${esc(r.lang.name)}・${r.maps.map(m => ({ google: 'Google Maps', naver: 'Naver Map', kakao: 'KakaoMap' })[m]).join('・')}</span></span>
+      ${k === state.region ? icon('check') : ''}
+    </button>`;
+  }).join('');
+}
+function openSheet(id) { $('#scrim').classList.add('show'); $(id).classList.add('show'); }
+function closeSheets() { $('#scrim').classList.remove('show'); $$('.sheet').forEach(s => s.classList.remove('show')); }
+$('#regionPill').addEventListener('click', () => { $('#regionSheetList').innerHTML = regionOptionsHtml(); openSheet('#regionSheet'); });
+$('#sheetClose').addEventListener('click', closeSheets);
+$('#scrim').addEventListener('click', () => { closeSheets(); pendingPhotoConfirm = null; });
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-region]');
+  if (!btn) return;
+  const k = btn.dataset.region;
+  if (k === state.region) { closeSheets(); return; }
+  if (state.history.length && !confirm(`${REGIONS[k].city}に切り替えると、いまのAI相談の会話はリセットされます。切り替えますか？`)) return;
+  setRegion(k);
+  closeSheets();
+  toast(`${REGIONS[k].country}／${REGIONS[k].city}に切り替えました`);
+});
+
+function setRegion(k) {
+  state.region = k;
+  store.set(STORE_REGION, k);
+  state.history = [];
+  state.chatMode = 'general';
+  state.trans = { from: 'ja', to: 'local' };
+  applyRegion();
+}
+
+function applyRegion() {
+  const r = R();
+  $('#regionCode').textContent = r.code;
+  $('#regionCity').textContent = r.city;
+  $('#originInput').placeholder = r.placeholders.origin;
+  $('#destInput').placeholder = r.placeholders.dest;
+  $('#spotArea').placeholder = r.placeholders.area;
+  $('#heroSub').textContent = `${r.city}での移動・食事・トラブルを、AIにそのまま相談できます。`;
+  $('#homeChips').innerHTML = r.examples.slice(0, 4).map(q => `<button class="chip" type="button" data-q="${esc(q)}">${esc(q)}</button>`).join('');
+  $('#destChips').innerHTML = `<button class="chip" type="button" data-dest="__hotel">${icon('hotel')}ホテル</button>` + r.destChips.map(d => `<button class="chip" type="button" data-dest="${esc(d)}">${esc(d)}</button>`).join('');
+  renderTransport();
+  renderRouteButtons();
+  renderLangSelects();
+  renderPhrases();
+  renderSpotButtons();
+  renderEmergency();
+  renderHomeHotel();
+  $('#transResult').innerHTML = '';
+  if ($('#view-chat').classList.contains('active')) renderChat();
+  if ($('#view-more').classList.contains('active')) renderMore();
+}
+
+/* ============================================================
+   6. ホーム
+   ============================================================ */
+function autoGrow(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 140) + 'px';
+}
+function bindEnterSend(ta, form) {
+  ta.addEventListener('input', () => autoGrow(ta));
+  ta.addEventListener('keydown', e => {
+    // 日本語変換中（IME確定のEnter）は送信しない
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
+      e.preventDefault();
+      form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit', { cancelable: true }));
+    }
+  });
+}
+bindEnterSend($('#homeInput'), $('#homeForm'));
+$('#homeForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const text = $('#homeInput').value.trim();
+  if (!text) { $('#homeInput').focus(); toast('相談したいことを入力してください'); return; }
+  if (state.busy) return;
+  $('#homeInput').value = ''; autoGrow($('#homeInput'));
+  startChat(text, 'general');
+});
+document.addEventListener('click', e => {
+  const q = e.target.closest('[data-q]');
+  if (q) { if (state.busy) { toast('回答を作成中です'); return; } startChat(q.dataset.q, state.chatMode || 'general'); }
+});
+
+function startChat(text, mode) {
+  if (mode) state.chatMode = mode;
+  if (location.hash !== '#chat') location.hash = '#chat';
+  setTimeout(() => sendChat(text), 30);
+}
+
+function renderHomeHotel() {
+  const h = getHotel();
+  const box = $('#homeHotel');
+  if (!h) {
+    box.innerHTML = `<a class="hotel-empty" href="#more" data-goto-hotel>${icon('hotel')}<span style="flex:1"><b style="display:block;color:var(--ink);font-size:15px">ホテルを登録</b><span class="note">登録すると「ホテルに戻る」とタクシー用画面が使えます</span></span>${icon('chev')}</a>`;
+    return;
+  }
+  box.innerHTML = `<div class="hotel-quick">
+    <span class="hq-ic">${icon('hotel')}</span>
+    <div class="hq-main"><span>${esc(R().city)}のホテル</span><b>${esc(h.name || h.localName || h.address)}</b></div>
+    <div class="hq-btns">
+      <button type="button" data-hotel-route aria-label="ホテルへの経路を地図アプリで開く">${icon('map')}</button>
+      <button type="button" data-hotel-show aria-label="タクシー運転手に見せる">${icon('expand')}</button>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   7. AI相談チャット
+   ============================================================ */
+const MODE_LABEL = { emergency: '緊急サポートの相談', spots: '観光スポットの相談', transport: '交通の相談', general: '' };
+
+function renderChat() {
+  const log = $('#chatLog');
+  const tag = MODE_LABEL[state.chatMode];
+  $('#chatModeTag').innerHTML = tag ? `<span class="mode-tag">${icon(state.chatMode === 'emergency' ? 'shield' : state.chatMode === 'spots' ? 'pin' : 'train')}${tag}</span>` : '';
+  if (!state.history.length && !state.busy) {
+    log.innerHTML = `<div class="chat-empty">
+      <h2>${esc(R().city)}で、何に困っていますか？</h2>
+      <p class="note" style="margin:0 2px 14px">状況をそのまま書いてください。結論・具体的な行動・注意点の順で答えます。</p>
+      <div class="chips">${R().examples.map(q => `<button class="chip" type="button" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+    </div>`;
+    return;
+  }
+  log.innerHTML = state.history.map((m, i) => m.role === 'user'
+    ? `<div class="msg-user">${esc(m.display || m.content)}</div>`
+    : `<div class="msg-ai"><div class="ai-head"><svg class="brand-mark" aria-hidden="true"><use href="#logo-switch"/></svg>TABISWITCH AI</div><div class="md">${renderMd(m.content)}</div>
+        <div class="msg-actions"><button class="mini-btn" type="button" data-copy-msg="${i}">${icon('copy')}コピー</button></div></div>`
+  ).join('');
+  if (state.busy) log.insertAdjacentHTML('beforeend', `<div class="typing"><span class="dots"><i></i><i></i><i></i></span>回答を作成しています</div>`);
+}
+
+function scrollChatEnd() {
+  requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }));
+}
+
+async function sendChat(text, display) {
+  text = (text || '').trim();
+  if (!text || state.busy) return;
+  state.history.push({ role: 'user', content: text, display: display || text });
+  setBusy(true);
+  renderChat(); scrollChatEnd();
+  try {
+    const messages = state.history.slice(-12).map(m => ({ role: m.role, content: m.content }));
+    const reply = await callAI({ mode: state.chatMode, messages });
+    state.history.push({ role: 'model', content: reply });
+    setBusy(false);
+    renderChat();
+    const lastAi = $$('.msg-ai').pop();
+    if (lastAi) lastAi.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    // 失敗した質問は履歴から外し、入力欄に戻して再送できるようにする
+    state.history.pop();
+    setBusy(false);
+    renderChat();
+    $('#chatInput').value = display || text; autoGrow($('#chatInput'));
+    $('#chatLog').insertAdjacentHTML('beforeend', `<div class="msg-err" role="alert">${esc(err.message)}<div class="msg-actions"><button class="mini-btn" type="button" id="retryBtn">${icon('send')}もう一度送信</button></div></div>`);
+    $('#retryBtn').addEventListener('click', () => { $('#chatInput').value = ''; sendChat(text, display); });
+    scrollChatEnd();
+  }
+}
+
+bindEnterSend($('#chatInput'), $('#chatForm'));
+$('#chatForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const ta = $('#chatInput');
+  const text = ta.value.trim();
+  if (!text) { ta.focus(); return; }
+  if (state.busy) return;
+  ta.value = ''; autoGrow(ta);
+  sendChat(text);
+});
+$('#newChatBtn').addEventListener('click', () => {
+  if (state.busy) { toast('回答の作成が終わってから操作してください'); return; }
+  if (!state.history.length) { toast('新しい会話を始められます'); return; }
+  state.history = []; state.chatMode = 'general';
+  renderChat(); toast('会話をリセットしました');
+});
+$('#chatLog').addEventListener('click', e => {
+  const c = e.target.closest('[data-copy-msg]');
+  if (c) copyText(plainText(state.history[Number(c.dataset.copyMsg)].content));
+});
+$('#attachLocBtn').addEventListener('click', async () => {
+  const btn = $('#attachLocBtn');
+  btn.disabled = true; btn.querySelector('span').textContent = '取得中…';
+  try {
+    const p = await getPosition();
+    const ta = $('#chatInput');
+    const line = `（現在地: 緯度${p.lat.toFixed(5)}, 経度${p.lng.toFixed(5)}）`;
+    ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + line;
+    autoGrow(ta); ta.focus();
+    toast('現在地を入力欄に添えました');
+  } catch (err) { toast(err.message); }
+  btn.disabled = false; btn.querySelector('span').textContent = '現在地を添える';
+});
+
+/* ============================================================
+   8. 位置情報と地図・移動
+   ============================================================ */
+function getPosition() {
+  return new Promise((resolve, reject) => {
+    if (!('geolocation' in navigator)) { reject(new Error('この端末では位置情報を使えません。出発地を手入力してください。')); return; }
+    if (!window.isSecureContext) { reject(new Error('位置情報はhttpsで公開したページでのみ使えます。')); return; }
+    navigator.geolocation.getCurrentPosition(p => {
+      state.pos = { lat: p.coords.latitude, lng: p.coords.longitude, acc: Math.round(p.coords.accuracy), time: Date.now() };
+      resolve(state.pos);
+    }, err => {
+      const msg = err.code === 1
+        ? '位置情報の利用が許可されていません。iPhoneの「設定」→「プライバシーとセキュリティ」→「位置情報サービス」→「Safari」で許可するか、出発地を手入力してください。'
+        : err.code === 3 ? '位置情報の取得に時間がかかっています。屋外で再度お試しいただくか、出発地を手入力してください。'
+        : '現在地を取得できませんでした。出発地を手入力してください。';
+      reject(new Error(msg));
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+  });
+}
+
+function statusHtml(kind, text) {
+  return `<div class="status ${kind}">${icon(kind === 'ok' ? 'check' : kind === 'err' ? 'info' : 'locate')}<span>${esc(text)}</span></div>`;
+}
+
+$('#locateBtn').addEventListener('click', async () => {
+  const btn = $('#locateBtn');
+  btn.disabled = true; btn.querySelector('span').textContent = '取得しています…';
+  try {
+    const p = await getPosition();
+    $('#locStatus').innerHTML = statusHtml('ok', `現在地を取得しました（誤差 約${p.acc}m）`);
+    $('#originInput').value = '';
+  } catch (err) {
+    $('#locStatus').innerHTML = statusHtml('err', err.message);
+    $('#originInput').focus();
+  }
+  btn.disabled = false; btn.querySelector('span').textContent = state.pos ? '現在地を取り直す' : '現在地を取得する';
+});
+
+$('#modeSeg').addEventListener('click', e => {
+  const b = e.target.closest('[data-mode]');
+  if (!b) return;
+  state.travelMode = b.dataset.mode;
+  $$('#modeSeg button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', x === b); });
+  renderRouteButtons();
+});
+$('#destChips').addEventListener('click', e => {
+  const c = e.target.closest('[data-dest]');
+  if (!c) return;
+  if (c.dataset.dest === '__hotel') {
+    const h = getHotel();
+    if (!h) { toast('ホテルが未登録です。「その他」から登録してください'); return; }
+    $('#destInput').value = hotelQuery(h);
+  } else $('#destInput').value = c.dataset.dest;
+});
+
+function originValue() {
+  const typed = $('#originInput').value.trim();
+  if (typed) return typed;
+  if (state.pos) return `${state.pos.lat},${state.pos.lng}`;
+  return '';
+}
+
+function googleDirUrl(origin, dest, mode) {
+  const travelmode = { walking: 'walking', train: 'transit', bus: 'transit', taxi: 'driving' }[mode] || 'transit';
+  const p = new URLSearchParams({ api: '1', destination: dest, travelmode });
+  if (origin) p.set('origin', origin);
+  return `https://www.google.com/maps/dir/?${p.toString()}`;
+}
+const naverSearchUrl = q => `https://map.naver.com/p/search/${encodeURIComponent(q)}`;
+const kakaoSearchUrl = q => `https://map.kakao.com/link/search/${encodeURIComponent(q)}`;
+const googleSearchUrl = q => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+
+function renderRouteButtons() {
+  const r = R();
+  const notes = {
+    walking: '徒歩ルートを地図アプリで表示します。',
+    train: 'Google Mapsでは「公共交通機関」で検索します。電車の路線は地図アプリ上で選べます。',
+    bus: 'Google Mapsでは「公共交通機関」で検索します。地図アプリ上でバスを選んでください。',
+    taxi: '車のルートを表示します。' + r.taxiNote
+  };
+  let note = notes[state.travelMode];
+  if (r.key === 'kr') note += ' 韓国ではGoogle Mapsの徒歩・車ルートが使えない場合があるため、Naver MapかKakaoMapがおすすめです。';
+  $('#modeNote').textContent = note;
+  const btns = [];
+  for (const m of r.maps) {
+    if (m === 'google') btns.push(`<button class="btn ${r.key === 'kr' ? 'btn-line' : 'btn-primary'} btn-block" type="button" data-route="google">${icon('ext')}Google Mapsで経路を見る</button>`);
+    if (m === 'naver') btns.push(`<button class="btn btn-primary btn-block" type="button" data-route="naver">${icon('ext')}Naver Mapで目的地を開く</button>`);
+    if (m === 'kakao') btns.push(`<button class="btn btn-soft btn-block" type="button" data-route="kakao">${icon('ext')}KakaoMapで目的地を開く</button>`);
+  }
+  $('#routeBtns').innerHTML = btns.join('') + (r.key === 'kr' ? '<p class="note" style="margin:2px">Naver Map・KakaoMapでは目的地が開くので、「길찾기（道案内）」をタップして経路を確認してください。</p>' : '');
+}
+$('#routeBtns').addEventListener('click', e => {
+  const b = e.target.closest('[data-route]');
+  if (!b) return;
+  const dest = $('#destInput').value.trim();
+  if (!dest) { toast('目的地を入力してください'); $('#destInput').focus(); return; }
+  const kind = b.dataset.route;
+  let url;
+  if (kind === 'google') url = googleDirUrl(originValue(), dest, state.travelMode);
+  if (kind === 'naver') url = naverSearchUrl(dest);
+  if (kind === 'kakao') url = kakaoSearchUrl(dest);
+  window.open(url, '_blank', 'noopener');
+});
+$('#destInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); const first = $('#routeBtns [data-route]'); if (first) first.click(); }
+});
+
+function renderTransport() {
+  const r = R();
+  $('#transportList').innerHTML = r.transport.map(t => `<a class="link-item" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer">${icon('train')}<div class="li-main"><b>${esc(t.name)}</b><span>${esc(t.desc || '公式サイト')}</span></div>${icon('ext')}</a>`).join('');
+  $('#transportNote').textContent = r.notes;
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-ask]');
+  if (!a) return;
+  if (state.busy) { toast('回答を作成中です'); return; }
+  const r = R();
+  const q = a.dataset.ask === 'airport'
+    ? `${r.city}の空港から市内への主な行き方を、初心者向けに比較して教えてください。運賃や時刻は公式サイトで確認できるようにリンクも付けてください。`
+    : `${r.city}でタクシーに乗るとき、トラブルや高額請求を避けるコツを教えてください。運転手に見せる現地語の例文も付けてください。`;
+  state.history = []; state.chatMode = 'transport';
+  startChat(q, 'transport');
+});
+
+/* ============================================================
+   9. ホテル情報（localStorageに必要最低限だけ保存）
+   ============================================================ */
+function getHotel() {
+  const all = store.get(STORE_HOTEL, {});
+  const h = all[state.region];
+  return h && (h.name || h.address || h.localName) ? h : null;
+}
+function saveHotel(h) {
+  const all = store.get(STORE_HOTEL, {});
+  if (h) all[state.region] = h; else delete all[state.region];
+  return store.set(STORE_HOTEL, all);
+}
+const hotelQuery = h => h.address || h.localName || h.name;
+
+function hotelFormHtml(h = {}) {
+  return `<form id="hotelForm" autocomplete="off">
+    <div class="field"><label for="hName">ホテル名</label><input class="input" id="hName" value="${esc(h.name || '')}" placeholder="例：Hotel Sukhumvit Bangkok" maxlength="120"></div>
+    <div class="field"><label for="hLocal">現地語でのホテル名（任意・運転手に見せる用）</label><input class="input" id="hLocal" value="${esc(h.localName || '')}" placeholder="予約確認メールに記載があればコピー" maxlength="120"></div>
+    <div class="field"><label for="hAddr">住所</label><textarea class="textarea" id="hAddr" style="min-height:84px" placeholder="予約確認メールの住所をそのまま貼り付け" maxlength="300">${esc(h.address || '')}</textarea></div>
+    <div class="field"><label for="hTel">電話番号（任意）</label><input class="input" id="hTel" type="tel" inputmode="tel" value="${esc(h.phone || '')}" placeholder="+66 2 xxx xxxx" maxlength="40"></div>
+    <div class="btn-row">${h.name || h.address ? '<button class="btn btn-soft" type="button" id="hCancel">キャンセル</button>' : '<span></span>'}<button class="btn btn-primary" type="submit">保存する</button></div>
+  </form>`;
+}
+
+function renderHotelCard(editing = false) {
+  const card = $('#hotelCard');
+  const h = getHotel();
+  if (!h || editing) {
+    card.innerHTML = `<p class="note" style="margin:0 0 14px">${esc(R().city)}で泊まるホテルを登録すると、ホテルへの経路検索・住所コピー・タクシー運転手に見せる画面が使えます。この端末にだけ保存されます。</p>` + hotelFormHtml(h || {});
+    $('#hotelForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const data = { name: $('#hName').value.trim(), localName: $('#hLocal').value.trim(), address: $('#hAddr').value.trim(), phone: $('#hTel').value.trim() };
+      if (!data.name && !data.address) { toast('ホテル名か住所を入力してください'); $('#hName').focus(); return; }
+      if (!saveHotel(data)) { toast('保存できませんでした。プライベートブラウズを解除してお試しください'); return; }
+      toast('ホテル情報を保存しました');
+      renderHotelCard(); renderHomeHotel();
+    });
+    const c = $('#hCancel'); if (c) c.addEventListener('click', () => renderHotelCard());
+    return;
+  }
+  card.innerHTML = `
+    <div class="row" style="align-items:flex-start;margin-bottom:14px">
+      <span class="f-ic" style="display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:var(--surface);color:var(--navy);flex:none">${icon('hotel')}</span>
+      <div style="min-width:0;flex:1">
+        <b style="display:block;font-size:16.5px;line-height:1.4;word-break:break-word">${esc(h.name || h.localName)}</b>
+        ${h.localName && h.name ? `<span class="note" style="display:block">${esc(h.localName)}</span>` : ''}
+        ${h.address ? `<span style="display:block;font-size:14px;color:var(--ink-2);margin-top:4px;word-break:break-word">${esc(h.address)}</span>` : ''}
+        ${h.phone ? `<a href="tel:${esc(h.phone.replace(/[^\d+]/g, ''))}" style="display:inline-block;font-size:14px;margin-top:4px">${esc(h.phone)}</a>` : ''}
+      </div>
+    </div>
+    <div class="stack">
+      <button class="btn btn-primary btn-block" type="button" data-hotel-route>${icon('map')}ホテルに戻る（経路を開く）</button>
+      <button class="btn btn-blue btn-block" type="button" data-hotel-show>${icon('expand')}タクシー運転手に見せる</button>
+      <div class="btn-row">
+        <button class="btn btn-soft" type="button" data-hotel-copy>${icon('copy')}住所をコピー</button>
+        <button class="btn btn-soft" type="button" id="hEdit">編集する</button>
+      </div>
+      <button class="btn btn-line btn-block" type="button" id="hDelete">${icon('trash')}登録を削除</button>
+    </div>`;
+  $('#hEdit').addEventListener('click', () => renderHotelCard(true));
+  $('#hDelete').addEventListener('click', () => {
+    if (!confirm('登録したホテル情報を削除しますか？')) return;
+    saveHotel(null); toast('ホテル情報を削除しました'); renderHotelCard(); renderHomeHotel();
+  });
+}
+
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-hotel-route]')) {
+    const h = getHotel(); if (!h) return;
+    const r = R();
+    const q = hotelQuery(h);
+    const url = r.key === 'kr' ? naverSearchUrl(q) : googleDirUrl(state.pos ? `${state.pos.lat},${state.pos.lng}` : '', q, 'transit');
+    window.open(url, '_blank', 'noopener');
+    if (r.key === 'kr') toast('Naver Mapで「길찾기」をタップしてください');
+  }
+  if (e.target.closest('[data-hotel-show]')) showTaxiScreen();
+  if (e.target.closest('[data-hotel-copy]')) { const h = getHotel(); if (h) copyText([h.localName, h.address].filter(Boolean).join('\n') || h.name); }
+});
+
+function showTaxiScreen() {
+  const h = getHotel(); if (!h) { toast('ホテルが未登録です'); return; }
+  const r = R();
+  showScreen({
+    hint: 'この画面をタクシーの運転手に見せてください',
+    html: `<div class="ss-lead">${esc(r.driverLine)}</div>
+      <div class="ss-sub">Please take me to this hotel.</div>
+      ${h.localName ? `<div class="ss-main">${esc(h.localName)}</div>` : ''}
+      ${h.name ? `<div class="${h.localName ? 'ss-sub' : 'ss-main'}">${esc(h.name)}</div>` : ''}
+      ${h.address ? `<div class="ss-sub">${esc(h.address)}</div>` : ''}
+      <div class="ss-ja">「このホテルまでお願いします」（${esc(r.driverRead)}）</div>`,
+    actions: [
+      h.phone ? `<a class="btn" href="tel:${esc(h.phone.replace(/[^\d+]/g, ''))}">${icon('phone')}ホテルに電話</a>` : '',
+      `<button class="btn" type="button" data-speak-text="${esc(r.driverLine.replace('ครับ/ค่ะ', 'ครับ'))}" data-speak-lang="${r.lang.tts}">${icon('speaker')}読み上げ</button>`
+    ].join('')
+  });
+}
+
+/* ---------- 相手に見せる全画面 ---------- */
+let lastFocus = null;
+function showScreen({ hint, html, actions = '' }) {
+  lastFocus = document.activeElement;
+  $('#ssHint').textContent = hint || 'この画面を相手に見せてください';
+  $('#ssBody').innerHTML = html;
+  $('#ssActions').innerHTML = actions;
+  $('#showScreen').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  $('#ssClose').focus();
+}
+function closeShowScreen() {
+  $('#showScreen').classList.remove('show');
+  document.body.style.overflow = '';
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+$('#ssClose').addEventListener('click', closeShowScreen);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeShowScreen(); closeSheets(); } });
+document.addEventListener('click', e => {
+  const s = e.target.closest('[data-speak-text]');
+  if (s) speak(s.dataset.speakText, s.dataset.speakLang);
+});
+
+/* ============================================================
+   10. 翻訳
+   ============================================================ */
+function renderLangSelects() {
+  const L = LANGS();
+  if (!state.trans.to) state.trans.to = 'local';
+  const opts = sel => Object.entries(L).map(([k, v]) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${esc(v.label)}</option>`).join('');
+  $('#fromLang').innerHTML = opts(state.trans.from);
+  $('#toLang').innerHTML = opts(state.trans.to);
+}
+$('#fromLang').addEventListener('change', e => {
+  state.trans.from = e.target.value;
+  if (state.trans.from === state.trans.to) state.trans.to = state.trans.from === 'ja' ? 'local' : 'ja';
+  renderLangSelects();
+});
+$('#toLang').addEventListener('change', e => {
+  state.trans.to = e.target.value;
+  if (state.trans.from === state.trans.to) state.trans.from = state.trans.to === 'ja' ? 'local' : 'ja';
+  renderLangSelects();
+});
+$('#swapLang').addEventListener('click', () => {
+  [state.trans.from, state.trans.to] = [state.trans.to, state.trans.from];
+  renderLangSelects();
+});
+
+function renderTransResult({ text, read, note, lang, label }) {
+  $('#transResult').innerHTML = `<div class="result-big" role="region" aria-label="翻訳結果">
+    <div class="rb-label">${esc(label)}</div>
+    <div class="rb-text" lang="${esc(lang.slice(0, 2))}">${esc(text)}</div>
+    ${read ? `<div class="rb-read">${esc(read)}</div>` : ''}
+    ${note ? `<div class="rb-note">${esc(note)}</div>` : ''}
+    <div class="msg-actions">
+      <button class="mini-btn" type="button" id="trCopy">${icon('copy')}コピー</button>
+      <button class="mini-btn" type="button" data-speak-text="${esc(text)}" data-speak-lang="${esc(lang)}">${icon('speaker')}読み上げ</button>
+      <button class="mini-btn" type="button" id="trShow">${icon('expand')}相手に見せる</button>
+    </div>
+  </div>`;
+  $('#trCopy').addEventListener('click', () => copyText(text));
+  $('#trShow').addEventListener('click', () => showScreen({
+    html: `<div class="ss-lead" lang="${esc(lang.slice(0, 2))}">${esc(text)}</div>${read ? `<div class="ss-ja">${esc(read)}</div>` : ''}`,
+    actions: `<button class="btn" type="button" data-speak-text="${esc(text)}" data-speak-lang="${esc(lang)}">${icon('speaker')}読み上げ</button>`
+  }));
+}
+
+$('#transBtn').addEventListener('click', async () => {
+  const input = $('#transInput').value.trim();
+  if (!input) { toast('翻訳したい文章を入力してください'); $('#transInput').focus(); return; }
+  if (state.busy) return;
+  const L = LANGS();
+  const from = L[state.trans.from], to = L[state.trans.to];
+  const wantRead = state.trans.to !== 'ja';
+  const prompt = `次の${from.name}の文章を${to.name}に翻訳してください。旅行先（${R().country}）で現地の人にそのまま見せられる自然で丁寧な表現にしてください。
+出力は次の形式だけにしてください（前置き・説明は不要）。
+翻訳: （翻訳した文章）
+${wantRead ? '読み: （日本人が発音できるカタカナ読み）\n' : ''}補足: （誤解されやすい点があれば一言。なければ「なし」）
+
+文章:
+${input}`;
+  const btn = $('#transBtn');
+  setBusy(true);
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span><span>翻訳しています</span>';
+  try {
+    const reply = await callAI({ mode: 'translation', messages: [{ role: 'user', content: prompt }] });
+    const get = key => { const m = reply.match(new RegExp(`^\\s*\\**${key}\\**\\s*[:：]\\s*(.+)$`, 'm')); return m ? m[1].trim() : ''; };
+    let text = get('翻訳');
+    const read = wantRead ? get('読み') : '';
+    let note = get('補足');
+    if (!text) text = plainText(reply).trim();
+    if (/^なし[。.]?$/.test(note)) note = '';
+    renderTransResult({ text, read, note, lang: to.tts, label: `${from.name} → ${to.name}` });
+  } catch (err) {
+    $('#transResult').innerHTML = `<div class="status err" role="alert">${icon('info')}<span>${esc(err.message)}</span></div>`;
+  }
+  setBusy(false);
+  btn.disabled = false; btn.innerHTML = '<span>翻訳する</span>';
+});
+
+function renderPhrases() {
+  const r = R();
+  $('#phraseList').innerHTML = r.phrases.map((p, i) => `<button class="phrase" type="button" data-phrase="${i}">
+    <span class="p-main"><span class="p-ja">${esc(p[0])}</span><span class="p-local" lang="${r.lang.id}">${esc(p[1])}</span></span>${icon('expand')}</button>`).join('');
+}
+$('#phraseList').addEventListener('click', e => {
+  const b = e.target.closest('[data-phrase]');
+  if (!b) return;
+  const r = R(); const p = r.phrases[Number(b.dataset.phrase)];
+  const spoken = p[1].replace('ครับ/ค่ะ', 'ครับ').replace('ครับ/คะ', 'ครับ');
+  showScreen({
+    html: `<div class="ss-lead" lang="${r.lang.id}">${esc(p[1])}</div><div class="ss-sub">${esc(p[3])}</div><div class="ss-ja">${esc(p[0])}（${esc(p[2])}）</div>`,
+    actions: `<button class="btn" type="button" data-speak-text="${esc(spoken)}" data-speak-lang="${r.lang.tts}">${icon('speaker')}読み上げ</button><button class="btn" type="button" data-copy-text="${esc(p[1])}">${icon('copy')}コピー</button>`
+  });
+});
+document.addEventListener('click', e => { const c = e.target.closest('[data-copy-text]'); if (c) copyText(c.dataset.copyText); });
+
+/* ============================================================
+   11. 写真翻訳（Canvasで縮小・JPEG圧縮→Gemini）
+   ============================================================ */
+$('#camBtn').addEventListener('click', () => $('#camInput').click());
+$('#libBtn').addEventListener('click', () => $('#libInput').click());
+['#camInput', '#libInput'].forEach(sel => $(sel).addEventListener('change', async e => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  if (file.type && !file.type.startsWith('image/')) { toast('画像ファイルを選んでください'); return; }
+  try {
+    toast('写真を読み込んでいます');
+    state.photo = await compressImage(file, 1600, 0.8);
+    $('#photoResult').innerHTML = '';
+    renderPhoto();
+  } catch (err) { toast(err.message); }
+}));
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('この画像は読み込めませんでした。JPEG・PNG・WebPの写真でお試しください。'));
+    img.src = src;
+  });
+}
+async function compressImage(file, maxSide, quality) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImage(url);
+    const w0 = img.naturalWidth, h0 = img.naturalHeight;
+    if (!w0 || !h0) throw new Error('画像のサイズを読み取れませんでした。');
+    const scale = Math.min(1, maxSide / Math.max(w0, h0));
+    const w = Math.round(w0 * scale), h = Math.round(h0 * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); // 透過PNG対策
+    ctx.drawImage(img, 0, 0, w, h);
+    let dataUrl = canvas.toDataURL('image/jpeg', quality);
+    if (dataUrl.length > 5_500_000) dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+    canvas.width = canvas.height = 0;
+    return { dataUrl, w, h, bytes: Math.round((dataUrl.length - 23) * 0.75) };
+  } finally { URL.revokeObjectURL(url); }
+}
+
+function renderPhoto() {
+  const has = !!state.photo;
+  $('#photoEmpty').classList.toggle('hidden', has);
+  $('#photoReady').classList.toggle('hidden', !has);
+  if (!has) return;
+  $('#photoPreview').src = state.photo.dataUrl;
+  $('#photoMeta').textContent = `送信サイズ ${state.photo.w}×${state.photo.h}px・約${Math.max(1, Math.round(state.photo.bytes / 1024))}KB（自動で縮小済み）`;
+  $('#photoKinds').innerHTML = PHOTO_KINDS.map(k => `<button class="chip ${k.id === state.photoKind ? 'on' : ''}" type="button" data-kind="${k.id}">${esc(k.label)}</button>`).join('');
+}
+$('#photoKinds').addEventListener('click', e => {
+  const c = e.target.closest('[data-kind]'); if (!c) return;
+  state.photoKind = c.dataset.kind; renderPhoto();
+});
+$('#photoDel').addEventListener('click', () => {
+  state.photo = null; $('#photoAsk').value = ''; $('#photoResult').innerHTML = '';
+  renderPhoto(); toast('写真を削除しました');
+});
+
+let pendingPhotoConfirm = null;
+$('#photoSend').addEventListener('click', () => {
+  if (!state.photo) { toast('写真を選んでください'); return; }
+  if (state.busy) return;
+  $('#confirmThumb').src = state.photo.dataUrl;
+  pendingPhotoConfirm = true;
+  openSheet('#confirmSheet');
+});
+$('#confirmCancel').addEventListener('click', () => { pendingPhotoConfirm = null; closeSheets(); });
+$('#confirmOk').addEventListener('click', () => { if (!pendingPhotoConfirm) return; pendingPhotoConfirm = null; closeSheets(); sendPhoto(); });
+
+async function sendPhoto() {
+  if (!state.photo || state.busy) return;
+  const kind = PHOTO_KINDS.find(k => k.id === state.photoKind) || PHOTO_KINDS[0];
+  const extra = $('#photoAsk').value.trim();
+  const userText = kind.prompt + (extra ? `\n追加の質問: ${extra}` : '');
+  const content = `${userText}\n\n${PHOTO_BASE_PROMPT}`;
+  const btn = $('#photoSend');
+  setBusy(true);
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span><span>写真を読み取っています</span>';
+  $('#photoResult').innerHTML = `<div class="typing" style="margin-top:14px"><span class="dots"><i></i><i></i><i></i></span>AIが文字を読み取っています（10〜30秒ほど）</div>`;
+  const photo = state.photo;
+  try {
+    const reply = await callAI({ mode: 'photo-translation', messages: [{ role: 'user', content }], image: photo.dataUrl });
+    $('#photoResult').innerHTML = `<div class="result-card">
+      <div class="rc-head"><img src="${photo.dataUrl}" alt=""><div><b>翻訳結果</b><span>${esc(kind.label)}・${esc(R().city)}</span></div></div>
+      <div class="rc-body"><div class="md">${renderMd(reply)}</div>
+        <div class="msg-actions" style="margin-top:12px">
+          <button class="mini-btn" type="button" id="prCopy">${icon('copy')}コピー</button>
+          <button class="mini-btn" type="button" id="prFollow">${icon('chat')}続けてAIに質問</button>
+          <button class="mini-btn" type="button" id="prNew">${icon('camera')}別の写真</button>
+        </div>
+        <p class="note" style="margin:12px 0 0">読み取りに誤りがある可能性があります。アレルギーや価格など重要な点は、お店の人に確認してください。</p>
+      </div></div>`;
+    $('#prCopy').addEventListener('click', () => copyText(plainText(reply)));
+    $('#prFollow').addEventListener('click', () => {
+      if (state.busy) return;
+      state.history = [
+        { role: 'user', content: `${userText}\n（写真を送信しました。以下はAIが写真から読み取った結果です）`, display: `写真翻訳：${kind.label}` },
+        { role: 'model', content: reply }
+      ];
+      state.chatMode = 'general';
+      location.hash = '#chat';
+      setTimeout(() => $('#chatInput').focus(), 100);
+    });
+    $('#prNew').addEventListener('click', () => { state.photo = null; $('#photoAsk').value = ''; $('#photoResult').innerHTML = ''; renderPhoto(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('#photoResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    $('#photoResult').innerHTML = `<div class="status err" role="alert" style="margin-top:14px">${icon('info')}<span>${esc(err.message)}</span></div>`;
+  }
+  setBusy(false);
+  btn.disabled = false; btn.innerHTML = '<span>内容を確認して翻訳する</span>';
+}
+
+/* ============================================================
+   12. 観光スポット（地図サービスの検索リンクを生成）
+   ============================================================ */
+function renderSpotButtons() {
+  $('#spotCats').innerHTML = SPOT_CATS.map(c => `<button class="chip ${c.id === state.spotCat ? 'on' : ''}" type="button" data-cat="${c.id}">${esc(c.label)}</button>`).join('');
+  const r = R();
+  const btns = [];
+  if (r.key === 'kr') {
+    btns.push(`<button class="btn btn-primary btn-block" type="button" data-spot="naver">${icon('search')}Naver Mapで探す</button>`);
+    btns.push(`<button class="btn btn-soft btn-block" type="button" data-spot="kakao">${icon('search')}KakaoMapで探す</button>`);
+    btns.push(`<button class="btn btn-line btn-block" type="button" data-spot="google">${icon('search')}Google Mapsで探す</button>`);
+  } else {
+    btns.push(`<button class="btn btn-primary btn-block" type="button" data-spot="google">${icon('search')}Google Mapsで探す</button>`);
+  }
+  $('#spotBtns').innerHTML = btns.join('');
+}
+$('#spotCats').addEventListener('click', e => {
+  const c = e.target.closest('[data-cat]'); if (!c) return;
+  state.spotCat = c.dataset.cat; renderSpotButtons();
+});
+$('#spotNear').addEventListener('change', async e => {
+  if (!e.target.checked) { $('#spotLocStatus').innerHTML = ''; return; }
+  $('#spotLocStatus').innerHTML = statusHtml('', '現在地を取得しています…');
+  try {
+    const p = await getPosition();
+    $('#spotLocStatus').innerHTML = statusHtml('ok', `現在地の周辺で探します（誤差 約${p.acc}m）`);
+  } catch (err) {
+    e.target.checked = false;
+    $('#spotLocStatus').innerHTML = statusHtml('err', err.message);
+  }
+});
+$('#spotBtns').addEventListener('click', e => {
+  const b = e.target.closest('[data-spot]'); if (!b) return;
+  const r = R();
+  const cat = SPOT_CATS.find(c => c.id === state.spotCat);
+  const area = $('#spotArea').value.trim();
+  const near = $('#spotNear').checked && state.pos;
+  const word = r.key === 'kr' && b.dataset.spot !== 'google' ? cat.ko : cat.en;
+  const where = area || (near ? '' : (r.key === 'kr' && b.dataset.spot !== 'google' ? '서울' : r.city === 'バンコク' ? 'Bangkok' : 'Seoul'));
+  const q = [where, word].filter(Boolean).join(' ');
+  let url;
+  if (b.dataset.spot === 'google') {
+    url = near && !area
+      ? `https://www.google.com/maps/search/${encodeURIComponent(cat.en)}/@${state.pos.lat},${state.pos.lng},15z`
+      : googleSearchUrl(q);
+  }
+  if (b.dataset.spot === 'naver') url = naverSearchUrl(near && !area ? `내 주변 ${word}` : q);
+  if (b.dataset.spot === 'kakao') url = kakaoSearchUrl(q);
+  window.open(url, '_blank', 'noopener');
+});
+$('#spotAsk').addEventListener('click', () => {
+  if (state.busy) { toast('回答を作成中です'); return; }
+  const cat = SPOT_CATS.find(c => c.id === state.spotCat);
+  const area = $('#spotArea').value.trim();
+  const q = `${R().city}${area ? `の${area}周辺` : ''}で「${cat.label}」を探しています。失敗しない探し方、地図アプリでの検索キーワード（現地語も）、注意点を教えてください。`;
+  state.history = []; state.chatMode = 'spots';
+  startChat(q, 'spots');
+});
+
+/* ============================================================
+   13. 緊急サポート
+   ============================================================ */
+function renderEmergency() {
+  const r = R();
+  $('#sosGrid').innerHTML = r.emergency.map(n => `<a class="sos ${n.calm ? 'calm' : ''}" href="tel:${n.num}"><b>${n.num}</b><span>${esc(n.label)}</span></a>`).join('');
+  $('#embassyList').innerHTML = [{ name: r.embassy.name, desc: '連絡先・受付時間・パスポートの手続き（公式サイト）', url: r.embassy.url }, ...COMMON_LINKS]
+    .map(l => `<a class="link-item" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${icon('shield')}<div class="li-main"><b>${esc(l.name)}</b><span>${esc(l.desc)}</span></div>${icon('ext')}</a>`).join('');
+  $('#troubleList').innerHTML = TROUBLES.map(t => {
+    let steps = t.steps.slice();
+    if (t.id === 'police') steps.splice(1, 0, r.policeHint);
+    if (t.id === 'hotel') steps[3] = r.key === 'th' ? '解決しない場合はタイ国政府観光庁のホットライン 1672 に相談する。' : '解決しない場合は観光案内 1330（多言語対応）に相談する。';
+    return `<details class="trouble"><summary>${esc(t.title)}${icon('chev', 'ic chev')}</summary>
+      <ol class="steps">${steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+      <button class="btn btn-soft btn-block" type="button" data-trouble="${t.id}" style="margin-bottom:16px">${icon('chat')}この状況をAIに相談する</button>
+    </details>`;
+  }).join('');
+  $('#sosSource').textContent = `${r.emergencySource}番号や窓口は変わることがあります。渡航前に外務省 海外安全ホームページで最新情報を確認してください。`;
+}
+$('#troubleList').addEventListener('click', e => {
+  const b = e.target.closest('[data-trouble]'); if (!b) return;
+  if (state.busy) { toast('回答を作成中です'); return; }
+  const t = TROUBLES.find(x => x.id === b.dataset.trouble);
+  state.history = []; state.chatMode = 'emergency';
+  startChat(`${R().city}にいます。${t.ask}`, 'emergency');
+});
+
+/* ============================================================
+   14. その他・設定
+   ============================================================ */
+function renderMore() {
+  $('#regionInline').innerHTML = regionOptionsHtml();
+  renderHotelCard();
+  const msg = { loading: '地域データを読み込んでいます…', ok: '地域データ（data/*.json）を読み込みました。', fallback: '地域データファイルを読み込めなかったため、アプリ内蔵のデータで動作しています。' }[state.dataStatus];
+  $('#dataStatus').textContent = msg;
+}
+$('#clearData').addEventListener('click', () => {
+  if (!confirm('保存した国・都市の選択とホテル情報をすべて削除しますか？')) return;
+  store.del(STORE_HOTEL);
+  state.history = [];
+  setRegion('th');
+  store.del(STORE_REGION);
+  toast('保存したデータを削除しました');
+});
+
+/* ============================================================
+   15. data/*.json の読み込み（失敗してもアプリは止めない）
+   ============================================================ */
+async function loadRegionData() {
+  const results = await Promise.allSettled(REGION_ORDER.map(async k => {
+    const res = await fetch(REGIONS[k].dataFile, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(String(res.status));
+    return { k, data: await res.json() };
+  }));
+  let okCount = 0;
+  for (const r of results) {
+    if (r.status !== 'fulfilled') continue;
+    const { k, data } = r.value;
+    const region = REGIONS[k];
+    if (!data || typeof data !== 'object') continue;
+    okCount++;
+    if (typeof data.notes === 'string' && data.notes.trim()) region.notes = data.notes.trim();
+    if (Array.isArray(data.transport)) {
+      for (const t of data.transport) {
+        if (!t || typeof t.url !== 'string' || !/^https?:\/\//.test(t.url)) continue;
+        const norm = u => u.replace(/\/+$/, '').toLowerCase();
+        if (!region.transport.some(x => norm(x.url) === norm(t.url))) {
+          region.transport.push({ name: String(t.name || t.url).slice(0, 60), desc: String(t.desc || '公式情報').slice(0, 80), url: t.url });
+        }
+      }
+    }
+  }
+  state.dataStatus = okCount === REGION_ORDER.length ? 'ok' : 'fallback';
+  renderTransport();
+  if ($('#view-more').classList.contains('active')) renderMore();
+}
+
+/* ============================================================
+   16. 起動
+   ============================================================ */
+if (!state.trans.to) state.trans.to = 'local';
+applyRegion();
+route();
+loadRegionData().catch(() => { state.dataStatus = 'fallback'; });
+if ('speechSynthesis' in window) { window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => {}; }
+if (location.protocol === 'file:') setTimeout(() => toast('AI機能はNetlifyに公開したURLで動作します'), 800);
+})();
+</script>
+</body>
+</html>
