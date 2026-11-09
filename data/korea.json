@@ -1,0 +1,23 @@
+{
+  "country": "韓国",
+  "countryCode": "KR",
+  "language": "韓国語",
+  "cities": [
+    {
+      "name": "ソウル",
+      "naverMap": "https://map.naver.com/",
+      "kakaoMap": "https://map.kakao.com/"
+    }
+  ],
+  "transport": [
+    {
+      "name": "Naver Map",
+      "url": "https://map.naver.com/"
+    },
+    {
+      "name": "KakaoMap",
+      "url": "https://map.kakao.com/"
+    }
+  ],
+  "notes": "運賃・運行時間・運休情報は公式情報や現地地図サービスで確認してください。"
+}

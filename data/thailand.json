@@ -1,0 +1,22 @@
+{
+  "country": "タイ",
+  "countryCode": "TH",
+  "language": "タイ語",
+  "cities": [
+    {
+      "name": "バンコク",
+      "map": "https://www.google.com/maps/search/?api=1&query="
+    }
+  ],
+  "transport": [
+    {
+      "name": "BTS",
+      "url": "https://www.bts.co.th/"
+    },
+    {
+      "name": "MRT",
+      "url": "https://metro.bemplc.co.th/"
+    }
+  ],
+  "notes": "運賃・運行時間・運休情報は各交通機関の公式情報で確認してください。"
+}
