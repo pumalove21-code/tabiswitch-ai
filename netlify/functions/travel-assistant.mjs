@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = "gemini-2.5-flash";
+const MODEL = "gemini-3.8-flash";
 
 const headers = {
   "Content-Type": "application/json",
@@ -142,9 +142,8 @@ export async function handler(event) {
         },
         contents,
         generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2048,
-        },
+  maxOutputTokens: 2048,
+},
       }),
     });
 
